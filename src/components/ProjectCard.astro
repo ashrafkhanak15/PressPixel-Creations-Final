@@ -1,0 +1,7 @@
+---
+import type { Project } from '../../lib/content';
+import Icon from './Icon.astro';
+interface Props { project: Project; index: number; }
+const { project: p, index } = Astro.props;
+---
+<article class="project-card"><a href={`/work/${p.slug}`} class={`project-visual ${p.tone}`} aria-label={`Explore the ${p.name} project`}><div class="project-micro"><span>{p.sector}</span><span>0{index + 1}</span></div><div class="project-art"><div class="project-brand"><span>{p.mark}</span><p>{p.line}</p></div><img src={p.image} width="900" height="900" loading="lazy" alt={p.imageAlt}/></div><span class="project-open"><Icon name="arrow-up-right" size={22}/></span></a><div class="project-caption"><div><h3><a href={`/work/${p.slug}`}>{p.name}</a></h3><p>{p.subtitle}</p></div><span>{p.tags.join(' / ')}</span></div></article>

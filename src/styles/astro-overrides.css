@@ -1,0 +1,58 @@
+body { font-family: var(--font-primary); }
+.contact-title > span, h1 em, h2 em, .pull-quote em { font-family: var(--font-accent); }
+.wrap { width: calc(100% - (var(--page-gutter) * 2)); max-width: var(--layout-max); }
+.header { height: var(--header-height); }
+.section-space { padding-top: var(--section-space); padding-bottom: var(--section-space); }
+.button-primary:hover { background: var(--brand-primary-hover); }
+.studio-collaboration, .contact-next, .journal-feature-index { background: var(--brand-primary); }
+.journal-masthead h1 em { color: var(--brand-primary); }
+
+/* Native, zero-JavaScript disclosure components */
+.service-list details, .faq-list details { border-bottom: 1px solid var(--border-on-light-soft); }
+.faq-list details { border-color: var(--border-on-dark-soft); }
+.service-trigger, .faq-trigger { display: flex; width: 100%; cursor: pointer; list-style: none; }
+.service-trigger::-webkit-details-marker, .faq-trigger::-webkit-details-marker,
+.services-menu-trigger::-webkit-details-marker, .mobile-services summary::-webkit-details-marker { display: none; }
+.service-plus, .faq-trigger > span { margin-left: auto; transition: transform var(--motion-fast); font-size: 24px; line-height: 1; }
+.service-list details[open] .service-plus, .faq-list details[open] .faq-trigger > span { transform: rotate(45deg); }
+.service-content { padding: 0 0 28px 39px; }
+.faq-content { padding: 0 0 26px; }
+
+/* Native navigation and disclosure menus */
+.site-navigation { display: flex; align-items: center; gap: 32px; }
+.services-menu-item { position: static; }
+.services-menu-trigger { cursor: pointer; list-style: none; color: var(--color-text-strong); padding: 15px 0; font-size: 14px; }
+.services-menu-item[open] > .services-menu-trigger,
+.services-menu-trigger[aria-current="page"] { color: var(--brand-primary); }
+.services-menu-item:not([open]) .services-mega-menu { display: none; }
+.services-mega-menu { z-index: 50; }
+.mega-heading a, .mega-bottom a { display: flex; align-items: center; gap: 10px; }
+.mega-services > a > .icon { color: var(--brand-primary); }
+
+.mobile-dialog { width: min(650px, calc(100% - 24px)); max-width: none; color: var(--color-paper); }
+.mobile-dialog::backdrop { background: var(--dialog-backdrop); backdrop-filter: blur(8px); }
+.mobile-dialog[open] { display: flex; flex-direction: column; }
+.mobile-close { display: grid; place-items: center; border: 0; background: transparent; color: inherit; width: 42px; height: 42px; padding: 0; }
+.mobile-menu .icon, .mobile-close .icon { width: 22px; height: 22px; }
+.mobile-services summary::marker, .services-menu-trigger::marker { content: ''; }
+.mobile-services .submenu-button { margin-left: auto; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--border-on-dark); border-radius: 50%; background: var(--color-surface-interactive); transition: background var(--motion-fast), border-color var(--motion-fast); }
+.mobile-services .submenu-button .icon { width: 20px; height: 20px; }
+.mobile-services[open] .submenu-button { background: var(--brand-primary); border-color: var(--brand-primary); color: var(--brand-on-primary); }
+.mobile-services[open] .submenu-toggle-icon { transform: rotate(180deg); }
+.submenu-toggle-icon { transition: transform var(--motion-fast) var(--ease-brand); }
+.mobile-dialog nav > a, .mobile-services > summary { display: flex; align-items: center; gap: 15px; font-size: 40px; letter-spacing: -1.5px; border-top: 1px solid var(--border-on-dark-soft); padding: 18px 0; list-style: none; cursor: pointer; }
+.mobile-dialog nav > a > .icon { margin-left: auto; }
+.mobile-services > summary small { font-size: 12px; color: var(--color-text-faint); letter-spacing: 0; }
+.mobile-service-links { padding-bottom: 12px; }
+.interest-choice input, .form-consent input { accent-color: var(--brand-primary); }
+.interest-choice:has(input:checked) { background: var(--brand-primary); color: var(--color-ink); border-color: var(--brand-primary); }
+.interest-choice input { width: 14px; height: 14px; }
+.form-consent input { width: 17px; height: 17px; margin-top: 3px; flex: 0 0 auto; }
+
+@media (max-width: 800px) {
+  .site-navigation, .header-cta { display: none; }
+  .mobile-menu { display: grid; place-items: center; color: var(--color-paper); }
+}
+@media (max-width: 560px) {
+  .mobile-dialog nav > a, .mobile-services > summary { font-size: 33px; }
+}

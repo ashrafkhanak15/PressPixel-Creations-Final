@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import FAQ from '../components/FAQ.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionLabel from '../components/SectionLabel.astro';
+const contactFaqs: [string,string][] = [
+  ['What should I include in my enquiry?','Tell us what you sell, who the ideal client is, where leads currently come from, what feels broken, and what you want to happen more often. Add your website and any firm deadline or technical requirement.'],
+  ['Can we talk before I choose a service?','Yes. Start with the problem rather than guessing the package. We can identify whether the priority is message, website, search visibility, paid traffic, content, or follow-up.'],
+  ['Do you need access to my website right away?','No. A public website address and a plain description of the problem are enough for the first conversation. We request access only after the work and responsibilities are agreed.'],
+  ['Will you tell me if you are not the right fit?','Yes. A useful first conversation should clarify the next step, even when that step is not hiring us. We would rather identify a mismatch early than sell the wrong work.']
+];
+const faqSchema = { '@type':'FAQPage', mainEntity:contactFaqs.map(([name,text]) => ({ '@type':'Question', name, acceptedAnswer:{ '@type':'Answer', text } })) };
+---
+<BaseLayout title="Start a Web Design Project" description="Tell PressPixel Creations where your website, SEO, marketing, or follow-up is underperforming. Get a clear conversation about the right next step." schema={faqSchema}>
+  <main id="main">
+    <PageHero eyebrow="START WITH THE BOTTLENECK" title="Tell us where growth" accent="is getting stuck." />
+    <section class="wrap contact-layout">
+      <div class="contact-info">
+        <p>You do not need to diagnose the solution. Tell us what the business sells, who you want to reach, what is not working, and what a worthwhile result would look like.</p>
+        <h2>START DIRECTLY</h2>
+        <a href="mailto:support@presspixelcreations.com">support@presspixelcreations.com <span aria-hidden="true">↗</span></a>
+        <address>30 N Gould St, Ste R<br/>Sheridan, WY 82801<br/><a href="tel:+16463768582">+1 (646) 376 8582</a></address>
+        <div class="socials"><a href="https://www.instagram.com/presspixelcreations" target="_blank" rel="noreferrer">Instagram ↗</a><a href="https://www.facebook.com/people/PressPixel-Creations/61560553956268/" target="_blank" rel="noreferrer">Facebook ↗</a></div>
+      </div>
+      <EnquiryForm />
+    </section>
+    <section class="contact-next"><div class="wrap">
+      <SectionLabel>WHAT HAPPENS NEXT</SectionLabel><h2>No pitch-deck ambush.<br/>Just a useful diagnosis.</h2>
+      <div class="contact-next-grid">{[
+        ['01','We diagnose the bottleneck.','We review the business, current journey, audience, and the point where attention or trust appears to break.'],
+        ['02','We define the result.','We agree what should become clearer, easier, more visible, or more measurable before listing deliverables.'],
+        ['03','We scope the right work.','If there is a fit, the proposal explains the approach, responsibilities, costs, timing, and honest boundaries.']
+      ].map(([number, heading, text]) => <article data-reveal><span>{number}</span><h3>{heading}</h3><p>{text}</p></article>)}</div>
+    </div></section>
+    <section class="wrap section-space faq-section">
+      <div><SectionLabel>BEFORE YOU SEND</SectionLabel><h2>A useful brief<br/>can be simple.</h2></div>
+      <FAQ items={contactFaqs} />
+    </section>
+  </main>
+</BaseLayout>

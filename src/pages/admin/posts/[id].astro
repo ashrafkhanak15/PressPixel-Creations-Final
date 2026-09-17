@@ -1,0 +1,78 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getAdminBlogPost } from '../../../../db/blog';
+import { getRequestAdminSession } from '../../../../lib/admin-request';
+import { CSRF_COOKIE } from '../../../../lib/admin-auth';
+import { utcToDenverDateTime } from '../../../../lib/blog';
+import { cloudinaryUploadsAvailable } from '../../../../lib/cloudinary';
+
+export const prerender = false;
+
+let session;
+try {
+  session = await getRequestAdminSession(Astro);
+} catch {
+  return Astro.redirect('/admin/login?error=unavailable');
+}
+if (!session) return Astro.redirect('/admin/login');
+
+const id = Astro.params.id || '';
+let post;
+try {
+  post = await getAdminBlogPost(id);
+} catch {
+  return Astro.redirect('/admin?error=unavailable');
+}
+if (!post) return Astro.redirect('/admin/posts');
+
+const csrfToken = Astro.cookies.get(CSRF_COOKIE)?.value || '';
+const uploadsReady = cloudinaryUploadsAvailable();
+const editorLabel = post.status === 'published' ? 'PUBLISHED ARTICLE' : post.status === 'scheduled' ? 'SCHEDULED DRAFT' : post.status === 'trashed' ? 'TRASHED DRAFT' : 'PRIVATE DRAFT';
+const editorState = JSON.stringify({ content: post.content, featuredMedia: post.featuredMedia });
+---
+<AdminLayout title={`${post.title || 'Untitled draft'} | Editorial desk`}>
+  <header class="admin-topbar">
+    <a class="admin-brand" href="/admin" aria-label="Editorial desk">
+      <span class="admin-brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span>presspixel<small>CREATIONS</small></span>
+    </a>
+    <div class="admin-account"><a href="/admin/posts">All posts</a><span>{session.email}</span><form method="POST" action="/api/admin/logout"><input type="hidden" name="csrfToken" value={csrfToken} /><button type="submit">Sign out</button></form></div>
+  </header>
+
+  <main class="admin-editor-page">
+    <form id="post-editor" data-post-id={post.id} data-post-status={post.status} data-csrf={csrfToken} data-uploads-ready={uploadsReady} novalidate>
+      <textarea id="post-editor-state" hidden aria-hidden="true">{editorState}</textarea>
+      <div class="admin-editor-heading">
+        <div><p class="admin-kicker">{editorLabel}</p><a class="admin-back-link" href="/admin/posts">← All posts</a></div>
+        <div class="admin-editor-actions"><a id="post-preview" class="button button-secondary" href={`/admin/posts/${post.id}/preview`} target="_blank" rel="noopener">Private preview</a>{post.status === 'trashed' ? <button type="button" class="button button-secondary" data-save-post="draft">Restore as draft</button> : <><button type="button" class="button button-secondary" data-save-post="draft">Save draft</button><button type="button" class="button button-secondary" data-save-post="scheduled">Schedule</button><button type="button" class="button button-primary" data-save-post="published">Publish now</button><button type="button" class="button button-danger" data-save-post="trashed">Move to trash</button></>}</div>
+      </div>
+      <p id="editor-message" class="editor-message" hidden role="status" aria-live="polite"></p>
+
+      <div class="admin-editor-grid">
+        <section class="admin-editor-main" aria-labelledby="post-writing-title">
+          <label class="editor-title-field"><span class="sr-only">Post title</span><input id="post-title" data-post-field type="text" maxlength="200" placeholder="Give this post a useful, specific title" value={post.title} /></label>
+          <label class="editor-slug-field"><span>URL slug</span><input id="post-slug" data-post-field type="text" maxlength="200" placeholder="generated-from-title" value={post.slug} /></label>
+          <label class="editor-field editor-excerpt"><span>Excerpt</span><textarea id="post-excerpt" data-post-field maxlength="500" rows="3" placeholder="A concise summary for journal cards and search results.">{post.excerpt}</textarea></label>
+
+          <div class="editor-blocks-heading"><div><p class="admin-kicker">COMPOSE</p><h1 id="post-writing-title">Story blocks</h1></div><div class="editor-add-block"><label for="add-block-type" class="sr-only">Block type</label><select id="add-block-type"><option value="paragraph">Paragraph</option><option value="heading">Heading</option><option value="list">List</option><option value="quote">Quote</option><option value="callout">Callout</option><option value="faq">FAQ</option><option value="reference">Reference</option><option value="image" disabled={!uploadsReady}>Image</option></select><button id="add-block" class="button button-secondary" type="button">Add block</button></div></div>
+          <div id="editor-blocks" class="editor-blocks"></div>
+        </section>
+
+        <aside class="admin-editor-sidebar" aria-label="Post settings">
+          <section class="editor-panel"><p class="admin-kicker">TAXONOMY</p><label class="editor-field"><span>Primary category</span><input id="post-category" data-post-field type="text" maxlength="80" placeholder="For example, Web strategy" value={post.category} /></label><label class="editor-field"><span>Tags</span><input id="post-tags" data-post-field type="text" maxlength="960" placeholder="Separate tags with commas" value={post.tags.join(', ')} /></label></section>
+
+          <section class="editor-panel"><p class="admin-kicker">FEATURED IMAGE</p><div id="featured-media-preview" class="editor-featured-media"></div><button id="featured-media-upload" class="button button-secondary" type="button" disabled={!uploadsReady}>Upload featured image</button>{!uploadsReady && <p class="editor-help">Add Cloudinary credentials to enable image uploads.</p>}</section>
+
+          <section class="editor-panel"><p class="admin-kicker">SCHEDULE</p><label class="editor-field"><span>Publish time, America/Denver</span><input id="post-scheduled-for" data-post-field type="datetime-local" value={utcToDenverDateTime(post.scheduledFor)} /></label><p class="editor-help">Scheduled posts publish automatically at this Denver time. The value is stored in UTC.</p></section>
+
+          <details class="editor-panel" open><summary><span class="admin-kicker">SEARCH &amp; SHARING</span><span>SEO details</span></summary><label class="editor-field"><span>SEO title, 62 characters</span><input id="post-seo-title" data-post-field type="text" maxlength="62" value={post.seoTitle} placeholder="Defaults to post title" /></label><label class="editor-field"><span>Meta description, 170 characters</span><textarea id="post-meta-description" data-post-field maxlength="170" rows="3" placeholder="What should searchers know before clicking?">{post.metaDescription}</textarea></label><label class="editor-field"><span>Canonical URL</span><input id="post-canonical-url" data-post-field type="url" maxlength="500" placeholder="https://presspixelcreations.com/journal/..." value={post.canonicalUrl} /></label><label class="editor-field"><span>Social title</span><input id="post-social-title" data-post-field type="text" maxlength="70" value={post.socialTitle} placeholder="Defaults to SEO title" /></label><label class="editor-field"><span>Social description</span><textarea id="post-social-description" data-post-field maxlength="200" rows="3" placeholder="Defaults to meta description">{post.socialDescription}</textarea></label><label class="editor-checkbox"><input id="post-noindex" data-post-field type="checkbox" checked={post.noindex} /><span>Keep this out of search engines</span></label></details>
+
+          <details class="editor-panel" open><summary><span class="admin-kicker">ANSWER ENGINE</span><span>Direct answer</span></summary><label class="editor-field"><span>Answer-first summary</span><textarea id="post-aeo-summary" data-post-field maxlength="4000" rows="5" placeholder="Answer the article's main question in a direct, quotable way.">{post.aeoSummary}</textarea></label><p class="editor-help">Add FAQ and Reference blocks where useful. They become structured editorial data for the public journal.</p></details>
+        </aside>
+      </div>
+    </form>
+  </main>
+</AdminLayout>
+<script>
+  import '../../../scripts/admin-editor';
+</script>

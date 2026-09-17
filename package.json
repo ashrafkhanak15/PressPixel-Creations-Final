@@ -1,0 +1,44 @@
+{
+  "name": "presspixel-creations-astro",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@10.9.3",
+  "engines": {
+    "node": ">=22.19.0 <25",
+    "npm": ">=10 <12"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/generate-security-policy.mjs && node scripts/prepare-hostinger-entry.mjs && node scripts/validate-astro-output.mjs",
+    "start": "node --env-file-if-exists=.env ./server.mjs",
+    "preview": "astro preview",
+    "check": "astro check",
+    "validate": "node scripts/validate-astro-output.mjs",
+    "check:http": "node scripts/validate-production-http.mjs",
+    "test:rate-limit": "node --experimental-strip-types scripts/test-enquiry-rate-limit.mjs",
+    "test:admin-auth": "node --experimental-strip-types scripts/test-admin-auth.mjs",
+    "test:blog-editor": "node --experimental-strip-types scripts/test-blog-editor.mjs",
+    "verify": "npm run check && npm run test:rate-limit && npm run test:admin-auth && npm run test:blog-editor && npm run build && npm run check:http",
+    "og:image": "node scripts/generate-og-image.mjs",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrate-database.mjs",
+    "cms:import-legacy": "node --env-file-if-exists=.env --experimental-strip-types scripts/import-legacy-article.mjs",
+    "admin:reset-password": "node --env-file-if-exists=.env --experimental-strip-types scripts/reset-admin-password.mjs"
+  },
+  "dependencies": {
+    "@astrojs/node": "^11.1.5",
+    "astro": "^7.3.1",
+    "compression": "1.8.1",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
+    "mysql2": "^3.24.4",
+    "nodemailer": "10.0.10",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@types/node": "22.19.19",
+    "@types/nodemailer": "^7.0.1",
+    "typescript": "5.9.3"
+  }
+}

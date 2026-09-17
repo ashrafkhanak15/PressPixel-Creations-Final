@@ -1,0 +1,38 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getAdminBlogPost } from '../../../../../db/blog';
+import { getRequestAdminSession } from '../../../../../lib/admin-request';
+import { renderBlogDocument } from '../../../../../lib/blog-content';
+
+export const prerender = false;
+
+let session;
+try {
+  session = await getRequestAdminSession(Astro);
+} catch {
+  return Astro.redirect('/admin/login?error=unavailable');
+}
+if (!session) return Astro.redirect('/admin/login');
+
+let post;
+try {
+  post = await getAdminBlogPost(Astro.params.id || '');
+} catch {
+  return Astro.redirect('/admin/login?error=unavailable');
+}
+if (!post) return Astro.redirect('/admin/posts');
+const renderedContent = renderBlogDocument(post.content);
+---
+<AdminLayout title={`Preview: ${post.title || 'Untitled draft'}`}>
+  <main class="admin-preview">
+    <div class="admin-preview__bar"><a href={`/admin/posts/${post.id}`}>← Back to editor</a><span>Private preview, not public or indexed</span></div>
+    <article class="admin-preview__article">
+      <p class="admin-kicker">JOURNAL PREVIEW</p>
+      <h1>{post.title || 'Untitled draft'}</h1>
+      {post.excerpt && <p class="admin-preview__excerpt">{post.excerpt}</p>}
+      {post.featuredMedia && <figure class="journal-image"><img src={post.featuredMedia.url} alt={post.featuredMedia.altText} width={post.featuredMedia.width} height={post.featuredMedia.height} />{post.featuredMedia.caption && <figcaption>{post.featuredMedia.caption}</figcaption>}</figure>}
+      {post.aeoSummary && <aside class="journal-callout"><h2>In brief</h2><p>{post.aeoSummary}</p></aside>}
+      <div class="admin-preview__content" set:html={renderedContent}></div>
+    </article>
+  </main>
+</AdminLayout>

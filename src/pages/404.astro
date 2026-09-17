@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+---
+<BaseLayout title="Page not found" description="The requested page could not be found." noindex>
+  <main id="main">
+    <PageHero eyebrow="404 / A SMALL DETOUR" title="This pixel" accent="went wandering." text="We couldn’t find that page. Let’s get you back to something good." />
+    <div class="wrap inner-section"><a href="/" class="button button-primary">Back to the studio <span aria-hidden="true">↗</span></a></div>
+  </main>
+</BaseLayout>

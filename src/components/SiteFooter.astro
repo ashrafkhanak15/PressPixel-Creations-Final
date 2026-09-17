@@ -1,0 +1,22 @@
+---
+import Brand from './Brand.astro';
+import { services } from '../../lib/content';
+---
+<footer class="footer wrap">
+  <div class="footer-top">
+    <a href="/" aria-label="PressPixel Creations home"><Brand /></a>
+    <p>Good businesses deserve<br/>websites that pull their weight.</p>
+    <nav aria-label="More pages"><a href="/pricing">Pricing & plans</a><a href="/journal">Journal</a><a href="/contact">Find the bottleneck</a></nav>
+    <nav aria-label="Social media">
+      <a href="https://www.instagram.com/presspixelcreations" target="_blank" rel="noreferrer">Instagram <span aria-hidden="true">↗</span></a>
+      <a href="https://www.facebook.com/people/PressPixel-Creations/61560553956268/" target="_blank" rel="noreferrer">Facebook <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <nav class="footer-services" aria-label="Services">{services.map(service => <a href={`/services/${service.slug}`}>{service.name}</a>)}</nav>
+  <div class="footer-wordmark" aria-hidden="true">presspixel</div>
+  <div class="footer-bottom">
+    <span>© {new Date().getFullYear()} PressPixel Creations</span>
+    <div><a href="/privacy-policy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/refund_returns">Refund policy</a></div>
+    <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
+  </div>
+</footer>

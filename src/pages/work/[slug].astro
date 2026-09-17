@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectPage from '../../components/ProjectPage.astro';
+import { projects } from '../../../lib/content';
+
+export function getStaticPaths() {
+  return projects.map(project => ({ params: { slug: project.slug }, props: { project } }));
+}
+const { project } = Astro.props;
+const url = `https://presspixelcreations.com/work/${project.slug}`;
+const description = project.slug === 'vital-tails'
+  ? 'See how the Vital Tails veterinary website uses warm visual design, clear service information, and simple contact paths to reduce uncertainty.'
+  : 'See how the Omnifood concept website uses product imagery and a clear page narrative to make a meal subscription easier to understand.';
+const schema = [
+  { '@type':'CreativeWork', '@id':`${url}#project`, name:project.name, description:project.description, url, creator:{ '@id':'https://presspixelcreations.com/#business' } },
+  { '@type':'BreadcrumbList', itemListElement:[
+    { '@type':'ListItem', position:1, name:'Home', item:'https://presspixelcreations.com/' },
+    { '@type':'ListItem', position:2, name:'Work', item:'https://presspixelcreations.com/work' },
+    { '@type':'ListItem', position:3, name:project.name, item:url }
+  ] }
+];
+---
+<BaseLayout title={`${project.name} Web Design Case Study`} description={description} schema={schema}>
+  <ProjectPage slug={project.slug} />
+</BaseLayout>

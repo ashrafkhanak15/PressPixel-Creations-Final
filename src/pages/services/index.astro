@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactBanner from '../../components/ContactBanner.astro';
+import FAQ from '../../components/FAQ.astro';
+import Icon from '../../components/Icon.astro';
+import SectionLabel from '../../components/SectionLabel.astro';
+import { services } from '../../../lib/content';
+const startingPoints = [
+  { heading:'“People visit, but they do not enquire.”', text:'Clarify the offer, earn confidence sooner, and remove friction from the next step.', links:[['Web design','web-development'],['Copy & reputation','content-writing']] },
+  { heading:'“We are good, but hard to find.”', text:'Build a credible identity and become more visible when suitable buyers search.', links:[['Branding & SEO','branding-seo'],['Digital marketing','digital-marketing']] },
+  { heading:'“Leads arrive, then go quiet.”', text:'Connect the campaign, landing page, response, and follow-up instead of losing people at the handoffs.', links:[['Email marketing','email-marketing'],['Website as a Service','waas']] }
+];
+const serviceListSchema = { '@type':'ItemList', name:'PressPixel Creations services', itemListElement:services.map((service, index) => ({ '@type':'ListItem', position:index + 1, name:service.name, url:`https://presspixelcreations.com/services/${service.slug}` })) };
+---
+<BaseLayout title="Web Design, SEO & Marketing Services" description="Explore web design, SEO, digital marketing, email, copywriting, reputation, and ongoing website services built to generate qualified enquiries." schema={serviceListSchema}>
+<main id="main" class="services-index">
+  <section class="wrap expertise-hero"><SectionLabel>WEB DESIGN AND DIGITAL GROWTH SERVICES</SectionLabel><h1><span class="title-line"><span>More traffic will not fix</span></span><span class="title-line"><span>a weak <em>journey.</em></span></span></h1><div class="expertise-lead"><span class="expertise-count">06<small>CONNECTED DISCIPLINES</small></span><p>PressPixel connects the path from discovery to trust, enquiry, and follow-up. Start with the bottleneck. Add only the work required to remove it.</p><a class="text-link" href="#capabilities">Explore the six services <Icon name="arrow-right" size={18}/></a></div></section>
+  <section class="wrap capability-directory" id="capabilities" aria-label="Our six services">{services.map((service, index) => <a class={`capability-row capability-${service.slug}`} data-reveal href={`/services/${service.slug}`}><span class="capability-number">0{index + 1}</span><div class="capability-title"><span>{service.category}</span><h2>{service.name}</h2></div><div class="capability-description"><p>{service.short}</p><span>{service.items.slice(0, 3).join(' · ')}</span></div><Icon name="arrow-up-right" size={32}/></a>)}</section>
+  <section class="starting-points"><div class="wrap"><div class="section-heading"><div><SectionLabel>WHERE ARE YOU RIGHT NOW?</SectionLabel><h2>Start with the need.<br/><span>Build the right response.</span></h2></div></div><div class="starting-grid">{startingPoints.map(point => <article data-reveal><h3>{point.heading}</h3><p>{point.text}</p><div>{point.links.map(([label, slug]) => <a href={`/services/${slug}`}>{label}<Icon name="arrow-up-right" size={16}/></a>)}</div></article>)}</div></div></section>
+  <section class="wrap connected-section section-space"><SectionLabel>THE HANDOFFS MATTER</SectionLabel><h2>Every handoff can lose the lead.<br/>We close the gaps.<br/><span>Then strengthen the whole.</span></h2><div><p>An ad hands attention to a landing page. The page hands intent to a form or call. The enquiry hands trust to follow-up. We examine the full journey, define the priority, and make ownership clear before work begins.</p><a class="text-link" href="/pricing">Compare ways to work together <Icon name="arrow-up-right" size={18}/></a></div></section>
+  <section class="wrap section-space faq-section"><div><SectionLabel>BEFORE YOU CHOOSE A SERVICE</SectionLabel><h2>Start with the problem.<br/>Not the package.</h2></div><FAQ /></section>
+  <ContactBanner />
+</main>
+</BaseLayout>

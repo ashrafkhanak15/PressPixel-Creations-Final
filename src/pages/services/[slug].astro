@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ServicePage from '../../components/ServicePage.astro';
+import { services } from '../../../lib/content';
+import { serviceDetails } from '../../../lib/service-details';
+
+export function getStaticPaths() {
+  return services.map(service => ({ params:{ slug:service.slug }, props:{ service } }));
+}
+const { service } = Astro.props;
+const detail = serviceDetails[service.slug];
+const url = `https://presspixelcreations.com/services/${service.slug}`;
+const schema = [
+  { '@type':'Service', '@id':`${url}#service`, name:service.name, serviceType:service.name, description:service.intro, url, provider:{ '@id':'https://presspixelcreations.com/#business' } },
+  { '@type':'FAQPage', mainEntity:detail.faqs.map(([name,text]) => ({ '@type':'Question', name, acceptedAnswer:{ '@type':'Answer', text } })) },
+  { '@type':'BreadcrumbList', itemListElement:[
+    { '@type':'ListItem', position:1, name:'Home', item:'https://presspixelcreations.com/' },
+    { '@type':'ListItem', position:2, name:'Services', item:'https://presspixelcreations.com/services' },
+    { '@type':'ListItem', position:3, name:service.name, item:url }
+  ] }
+];
+---
+<BaseLayout title={service.seoTitle} description={service.seoDescription} schema={schema}>
+  <ServicePage slug={service.slug} />
+</BaseLayout>

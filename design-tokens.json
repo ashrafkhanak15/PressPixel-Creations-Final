@@ -1,0 +1,247 @@
+{
+  "color": {
+    "brand": {
+      "primary": {
+        "$value": "#FFA500",
+        "$type": "color",
+        "$description": "Primary conversion and emphasis color",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "primary-hover": {
+        "$value": "#FFB733",
+        "$type": "color",
+        "$description": "Primary hover state",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "primary-pressed": {
+        "$value": "#E69500",
+        "$type": "color",
+        "$description": "Primary pressed state",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "on-primary": {
+        "$value": "#1B1200",
+        "$type": "color",
+        "$description": "Text and icons on the orange primary surface",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      }
+    },
+    "surface": {
+      "background": {
+        "$value": "#0B0B0B",
+        "$type": "color",
+        "$description": "Main dark canvas",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "default": {
+        "$value": "#141414",
+        "$type": "color",
+        "$description": "Default elevated dark surface",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "raised": {
+        "$value": "#171717",
+        "$type": "color",
+        "$description": "Raised dark surface",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "interactive": {
+        "$value": "#262626",
+        "$type": "color",
+        "$description": "Interactive dark surface",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "paper": {
+        "$value": "#F2F2EB",
+        "$type": "color",
+        "$description": "Primary warm light and dark-mode foreground",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "paper-muted": {
+        "$value": "#EEEEE5",
+        "$type": "color",
+        "$description": "Muted warm-light section surface",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "paper-warm": {
+        "$value": "#E0D7C8",
+        "$type": "color",
+        "$description": "Warm editorial and case-study surface",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      }
+    },
+    "text": {
+      "primary": {
+        "$value": "#F2F2EB",
+        "$type": "color",
+        "$description": "Main text on dark surfaces",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "strong": {
+        "$value": "#CDCDC7",
+        "$type": "color",
+        "$description": "Strong supporting text",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "muted": {
+        "$value": "#A5A59B",
+        "$type": "color",
+        "$description": "Secondary body text",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "subtle": {
+        "$value": "#85857B",
+        "$type": "color",
+        "$description": "Metadata and low-priority text",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "faint": {
+        "$value": "#6F6F67",
+        "$type": "color",
+        "$description": "Decorative or nonessential faint text; not AA for normal text on the main background",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "on-light": {
+        "$value": "#171713",
+        "$type": "color",
+        "$description": "Primary text on warm-light surfaces",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "on-light-muted": {
+        "$value": "#5C5C55",
+        "$type": "color",
+        "$description": "Secondary text on warm-light surfaces",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      }
+    },
+    "border": {
+      "default": {
+        "$value": "#353532",
+        "$type": "color",
+        "$description": "Default dark-surface structural border",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      }
+    },
+    "feedback": {
+      "danger": {
+        "$value": "#FF8989",
+        "$type": "color",
+        "$description": "Error and destructive feedback",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "danger-soft": {
+        "$value": "#FFAAA0",
+        "$type": "color",
+        "$description": "Soft error emphasis",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      }
+    }
+  },
+  "typography": {
+    "font-family": {
+      "primary": {
+        "$value": ["Studio", "Arial", "Helvetica", "sans-serif"],
+        "$type": "fontFamily",
+        "$description": "Primary variable sans family",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      },
+      "accent": {
+        "$value": ["Georgia", "Times New Roman", "serif"],
+        "$type": "fontFamily",
+        "$description": "Editorial serif accent",
+        "$extensions": { "anydesign": { "confidence": "high" } }
+      }
+    },
+    "font-size": {
+      "label": { "$value": "12px", "$type": "dimension" },
+      "meta": { "$value": "13px", "$type": "dimension" },
+      "small": { "$value": "14px", "$type": "dimension" },
+      "body": { "$value": "16px", "$type": "dimension" },
+      "body-large": { "$value": "17px", "$type": "dimension" },
+      "lead": { "$value": "18px", "$type": "dimension" },
+      "subhead": { "$value": "20px", "$type": "dimension" }
+    },
+    "font-weight": {
+      "regular": { "$value": 400, "$type": "fontWeight" },
+      "medium": { "$value": 500, "$type": "fontWeight" },
+      "semibold": { "$value": 600, "$type": "fontWeight" },
+      "display": { "$value": 650, "$type": "fontWeight" }
+    }
+  },
+  "spacing": {
+    "1": { "$value": "4px", "$type": "dimension" },
+    "2": { "$value": "8px", "$type": "dimension" },
+    "3": { "$value": "12px", "$type": "dimension" },
+    "4": { "$value": "16px", "$type": "dimension" },
+    "5": { "$value": "20px", "$type": "dimension" },
+    "6": { "$value": "24px", "$type": "dimension" },
+    "8": { "$value": "32px", "$type": "dimension" },
+    "9": { "$value": "36px", "$type": "dimension" },
+    "12": { "$value": "48px", "$type": "dimension" },
+    "14": { "$value": "56px", "$type": "dimension" },
+    "19": { "$value": "76px", "$type": "dimension" },
+    "24": { "$value": "96px", "$type": "dimension" },
+    "27": { "$value": "108px", "$type": "dimension" },
+    "28": { "$value": "112px", "$type": "dimension" }
+  },
+  "radius": {
+    "card": {
+      "$value": "4px",
+      "$type": "dimension",
+      "$description": "Editorial cards and image surfaces",
+      "$extensions": { "anydesign": { "confidence": "high" } }
+    },
+    "control": {
+      "$value": "8px",
+      "$type": "dimension",
+      "$description": "Conventional controls",
+      "$extensions": { "anydesign": { "confidence": "high" } }
+    },
+    "pill": {
+      "$value": "999px",
+      "$type": "dimension",
+      "$description": "Primary CTA and circular control radius",
+      "$extensions": { "anydesign": { "confidence": "high" } }
+    }
+  },
+  "layout": {
+    "max-width": {
+      "$value": "1512px",
+      "$type": "dimension"
+    },
+    "page-gutter": {
+      "desktop": { "$value": "56px", "$type": "dimension" },
+      "tablet": { "$value": "36px", "$type": "dimension" },
+      "mobile": { "$value": "20px", "$type": "dimension" }
+    },
+    "header-height": {
+      "desktop": { "$value": "108px", "$type": "dimension" },
+      "mobile": { "$value": "82px", "$type": "dimension" }
+    },
+    "section-space": {
+      "desktop": { "$value": "112px", "$type": "dimension" },
+      "mobile": { "$value": "76px", "$type": "dimension" }
+    }
+  },
+  "motion": {
+    "duration": {
+      "fast": { "$value": "200ms", "$type": "duration" },
+      "standard": { "$value": "300ms", "$type": "duration" },
+      "medium": { "$value": "600ms", "$type": "duration" }
+    },
+    "easing": {
+      "brand": {
+        "$value": [0.2, 0.7, 0.2, 1],
+        "$type": "cubicBezier"
+      }
+    }
+  },
+  "$extensions": {
+    "anydesign": {
+      "source": "C:\\Users\\ashra\\Downloads\\Compressed\\presspixel-creations-hostinger-ready-with-email-origin-fix.zip",
+      "captured_at": "2026-09-16",
+      "method": "source inspection + CSS variable extraction + local multi-viewport browser rendering",
+      "spec": "W3C Design Tokens Community Group 2025.10"
+    }
+  }
+}

@@ -1,0 +1,114 @@
+---
+import { services } from '../../lib/content';
+import Icon from './Icon.astro';
+---
+<div class="enquiry-shell" data-enquiry-shell>
+  <form class="enquiry-form" data-enquiry-form>
+    <div class="form-row"><div class="field"><label for="name">Your name *</label><input id="name" name="name" autocomplete="name" placeholder="Alex Morgan" required minlength="2" maxlength="120"/></div><div class="field"><label for="email">Email address *</label><input id="email" name="email" autocomplete="email" type="email" placeholder="alex@company.com" required maxlength="254"/></div></div>
+    <div class="form-row"><div class="field"><label for="company">Company</label><input id="company" name="company" autocomplete="organization" placeholder="Your business name" maxlength="160"/></div><div class="field"><label for="website">Current website</label><input id="website" name="website" autocomplete="url" placeholder="www.yourwebsite.com" maxlength="500"/></div></div>
+    <fieldset><legend class="field-legend">What can we help with?</legend><div class="interest-options">{services.map(service => <label class="interest-choice"><input type="checkbox" name="services" value={service.name}/>{service.name}</label>)}</div></fieldset>
+    <div class="field"><label for="message">What is getting in the way? *</label><textarea id="message" name="message" placeholder="What you sell, who you want to reach, what is not working, and what you want to happen more often…" required minlength="15" maxlength="5000" rows="4"></textarea></div>
+    <div class="honeypot" aria-hidden="true"><label for="company-fax">Company fax</label><input id="company-fax" name="companyFax" tabindex="-1" autocomplete="off"/></div>
+    <div class="form-consent"><input type="checkbox" id="consent" name="consent" required aria-label="I agree to the privacy policy"/><label for="consent">I agree to the <a href="/privacy-policy" target="_blank">privacy policy</a> and to being contacted about my enquiry.</label></div>
+    <div class="form-submit"><button type="submit" class="button button-primary"><span data-submit-label>Send enquiry</span><Icon name="arrow-up-right" size={19}/></button><p class="form-status" role="alert" tabindex="-1" hidden></p></div>
+  </form>
+  <div class="success-state" data-enquiry-success tabindex="-1" role="status" hidden><Icon name="check-circle" size={34}/><h2>We have the context.</h2><p>Thanks, <span data-first-name></span>. We will review the bottleneck you described and reply with the most useful next question. You can also reach us at support@presspixelcreations.com.</p><button class="button button-primary" type="button" data-reset-enquiry>Send another enquiry<Icon name="arrow-up-right" size={18}/></button></div>
+</div>
+<script is:inline define:vars={{ serviceNames: services.map(service => service.name) }}>
+  function setupEnquiryForm() {
+    const shell = document.querySelector('[data-enquiry-shell]');
+    const form = shell?.querySelector('form');
+    if (!(form instanceof HTMLFormElement) || form.dataset.bound) return;
+    form.dataset.bound = 'true';
+    const submit = form.querySelector('button[type="submit"]');
+    const submitLabel = form.querySelector('[data-submit-label]');
+    const status = form.querySelector('.form-status');
+    const success = shell.querySelector('[data-enquiry-success]');
+    const firstName = shell.querySelector('[data-first-name]');
+    const service = new URLSearchParams(location.search).get('service');
+    if (service && serviceNames.includes(service)) {
+      const option = [...form.querySelectorAll('input[name="services"]')].find(input => input.value === service);
+      if (option instanceof HTMLInputElement) option.checked = true;
+    }
+
+    const showError = (message) => {
+      if (!(status instanceof HTMLElement)) return;
+      status.textContent = message;
+      status.hidden = false;
+      status.focus();
+    };
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!form.reportValidity() || !(submit instanceof HTMLButtonElement) || !(submitLabel instanceof HTMLElement)) return;
+      const data = new FormData(form);
+      const message = String(data.get('message') || '').trim();
+      if (message.length < 15) return showError('Please tell us a little more about your project.');
+      status?.setAttribute('hidden', '');
+      submit.disabled = true;
+      submitLabel.textContent = 'Sending your enquiry…';
+      const payload = {
+        id: crypto.randomUUID(),
+        name: String(data.get('name') || '').trim(),
+        email: String(data.get('email') || '').trim(),
+        company: String(data.get('company') || '').trim(),
+        website: String(data.get('website') || '').trim(),
+        message,
+        companyFax: String(data.get('companyFax') || ''),
+        services: data.getAll('services').map(String),
+        consent: data.get('consent') === 'on'
+      };
+      try {
+        const response = await fetch('/api/enquiries', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Your enquiry could not be saved. Please try again.');
+        if (firstName) firstName.textContent = payload.name.split(' ')[0];
+        form.hidden = true;
+        if (success instanceof HTMLElement) { success.hidden = false; success.focus(); }
+      } catch (error) {
+        showError(error instanceof Error ? error.message : 'Something went wrong. Please try again or email us directly.');
+      } finally {
+        submit.disabled = false;
+        submitLabel.textContent = 'Send enquiry';
+      }
+    });
+
+    shell.querySelector('[data-reset-enquiry]')?.addEventListener('click', () => {
+      form.reset();
+      form.hidden = false;
+      if (success instanceof HTMLElement) success.hidden = true;
+      form.querySelector('input')?.focus();
+    });
+
+    const context = document.modelContext;
+    if (context?.registerTool) {
+      const controller = new AbortController();
+      try {
+        Promise.resolve(context.registerTool({
+          name: 'prepare_project_enquiry', title: 'Prepare a project enquiry',
+          description: 'Fill the visible project enquiry form for the visitor to review. This does not send the enquiry or accept the privacy policy.',
+          inputSchema: { type: 'object', properties: { name:{type:'string',maxLength:120}, email:{type:'string',maxLength:254}, company:{type:'string',maxLength:160}, website:{type:'string',maxLength:500}, message:{type:'string',maxLength:5000}, services:{type:'array',items:{type:'string',enum:serviceNames}} }, additionalProperties:false },
+          annotations: { readOnlyHint:false, untrustedContentHint:false },
+          execute(input) {
+            if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Provide enquiry fields as an object.');
+            for (const [key, value] of Object.entries(input)) {
+              if (key === 'services') {
+                if (!Array.isArray(value) || value.some(item => !serviceNames.includes(item))) throw new Error('Choose a listed service.');
+                form.querySelectorAll('input[name="services"]').forEach(input => { if (input instanceof HTMLInputElement) input.checked = value.includes(input.value); });
+              } else {
+                const field = form.elements.namedItem(key);
+                if (typeof value !== 'string' || !(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) throw new Error('Invalid enquiry field.');
+                field.value = value;
+              }
+            }
+            form.hidden = false;
+            if (success instanceof HTMLElement) success.hidden = true;
+            return { status:'prepared', submitted:false, requires:'Review the form, agree to the privacy policy, and select Send enquiry.' };
+          }
+        }, { signal: controller.signal })).catch(() => {});
+      } catch {}
+    }
+  }
+  setupEnquiryForm();
+  document.addEventListener('astro:page-load', setupEnquiryForm);
+</script>

@@ -1,0 +1,38 @@
+---
+import ContactBanner from './ContactBanner.astro';
+import Icon from './Icon.astro';
+import SectionLabel from './SectionLabel.astro';
+import { projects } from '../../lib/content';
+interface Props { slug:string }
+const { slug } = Astro.props;
+const project = projects.find(item => item.slug === slug)!;
+const veterinary = slug === 'vital-tails';
+const next = projects.find(item => item.slug !== slug)!;
+const story = veterinary ? {
+  challenge:'A pet owner is not browsing casually. They are deciding who deserves their trust.',
+  context:'Veterinary websites often lead with the clinic when the visitor is thinking about an animal they love. Vital Tails needed to feel caring without becoming sentimental, and informative without making an already concerned owner work through clinical language.',
+  direction:'Lower the uncertainty before asking for contact.',
+  detail:'Warm animal imagery creates an immediate emotional cue. Plain-language service information then answers the practical question, while clear navigation and contact paths make it easier to move from concern to conversation.',
+  decisions:[['Lead with the relationship','Pet-centred imagery reflects what the visitor cares about before introducing the clinic.'],['Make care understandable','Service information is organised for an owner trying to work out whether the clinic can help.'],['Keep contact within reach','Clear routes to the clinic prevent a ready visitor from having to hunt for the next step.']],
+  journey:['Feel understood','Verify the care','Contact the clinic'],
+  closing:'The design outcome is a calmer, clearer first encounter. No invented conversion claim, just a journey built around the owner’s real decision.'
+} : {
+  challenge:'A subscription sounds convenient only after the visitor understands how it fits into everyday life.',
+  context:'Omnifood is a concept project for a meal-subscription experience. The page has to create appetite, explain the mechanism, and make the offer feel simple enough to consider without burying the visitor in operational detail.',
+  direction:'Earn attention with the product. Earn confidence with the explanation.',
+  detail:'Food imagery makes the benefit immediate. The structure then moves from promise to process and plan, so the visitor receives each answer when it becomes relevant instead of confronting the entire service at once.',
+  decisions:[['Make the benefit visible','Strong food photography turns an abstract subscription into something tangible and desirable.'],['Explain in buying order','The story moves from what the customer gets to how the service works and what to do next.'],['Protect the journey on mobile','Responsive layouts keep the imagery, explanation, and actions usable on smaller screens.']],
+  journey:['Want the outcome','Understand the model','Consider the plan'],
+  closing:'The design outcome is a subscription story that feels easier to understand. Omnifood is shown as a concept, not presented as a measured client result.'
+};
+const keywords = veterinary ? ['Reassuring','Human','Clear'] : ['Appetising','Simple','Confident'];
+---
+<main id="main" class={`case-study case-${slug}`}>
+  <section class="case-hero"><div class="wrap"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/work">Selected work</a><span>/</span><span>{project.name}</span></nav><SectionLabel>{project.sector}{!veterinary && ' / CONCEPT PROJECT'}</SectionLabel><h1><span class="title-line"><span>{project.name}</span></span></h1><div class="case-hero-bottom"><p>{project.subtitle}</p><span>{project.tags.join(' / ')}</span><a class="text-link" href={project.url} target="_blank" rel="noreferrer">Visit the website <Icon name="arrow-up-right" size={18}/></a></div><div class="case-image"><img src={project.image} alt={project.imageAlt} width="900" height="900" data-parallax/></div></div></section>
+  <section class="wrap case-context section-space"><SectionLabel number="01">THE BUYING MOMENT</SectionLabel><div><h2>{story.challenge}</h2><p>{story.context}</p></div></section>
+  <section class="case-direction"><div class="wrap"><SectionLabel number="02">THE STRATEGIC DIRECTION</SectionLabel><h2>{story.direction}</h2><p>{story.detail}</p><div class="case-keywords" aria-label="Design priorities">{keywords.map(word => <span>{word}</span>)}</div></div></section>
+  <section class="wrap case-decisions section-space"><div class="section-heading"><div><SectionLabel number="03">WHY THE PAGE WORKS THIS WAY</SectionLabel><h2>Three decisions.<br/>One clearer journey.</h2></div></div><div class="case-decision-grid">{story.decisions.map(([heading, description], index) => <article data-reveal><span>0{index + 1}</span><h3>{heading}</h3><p>{description}</p></article>)}</div></section>
+  <section class="wrap case-journey"><SectionLabel number="04">THE VISITOR’S DECISION PATH</SectionLabel><div data-flow>{story.journey.map((step, index) => <article data-flow-step><span>0{index + 1}</span><h3>{step}</h3>{index < 2 && <Icon name="arrow-right" size={25}/>}</article>)}</div><p>{story.closing}</p><a class="button button-outline" href={project.url} target="_blank" rel="noreferrer">Explore {project.name} <Icon name="arrow-up-right" size={18}/></a></section>
+  <section class="next-project wrap"><a href={`/work/${next.slug}`}><div><SectionLabel>THE NEXT BUYING JOURNEY</SectionLabel><h2>{next.name}</h2></div><Icon name="arrow-up-right" size={55}/></a></section>
+  <ContactBanner />
+</main>

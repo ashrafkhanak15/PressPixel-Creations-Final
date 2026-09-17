@@ -1,0 +1,107 @@
+---
+import Brand from './Brand.astro';
+import Icon from './Icon.astro';
+import { services } from '../../lib/content';
+
+const pathname = Astro.url.pathname;
+const current = (prefix: string) => pathname === prefix || pathname.startsWith(`${prefix}/`);
+---
+<a href="#main" class="skip-link">Skip to content</a>
+<div class="scroll-progress" aria-hidden="true"></div>
+<header class="header">
+  <div class="wrap header-inner">
+    <a href="/" aria-label="PressPixel Creations home"><Brand /></a>
+    <nav class="desktop-nav site-navigation" aria-label="Main navigation">
+      <a class="nav-page" href="/work" aria-current={current('/work') ? 'page' : undefined}>Work</a>
+      <details class="services-menu-item">
+        <summary class="services-menu-trigger" aria-current={current('/services') ? 'page' : undefined}>Services</summary>
+        <div class="services-mega-menu">
+<div class="mega-heading"><span>SIX PLACES GROWTH CAN GET STUCK</span><a href="/services">All services <Icon name="arrow-up-right" /></a></div>
+          <div class="mega-services">
+            {services.map((service, index) => <a href={`/services/${service.slug}`} aria-current={pathname === `/services/${service.slug}` ? 'page' : undefined}>
+              <small>0{index + 1}</small><div><strong>{service.name}</strong><span>{service.short}</span></div><Icon name="arrow-up-right" />
+            </a>)}
+          </div>
+          <div class="mega-bottom"><span>Start with the bottleneck.</span><a href="/contact">Find what to fix first <Icon name="arrow-up-right" /></a></div>
+        </div>
+      </details>
+      <a class="nav-page" href="/about" aria-current={pathname === '/about' ? 'page' : undefined}>Studio</a>
+      <a class="nav-page" href="/journal" aria-current={current('/journal') ? 'page' : undefined}>Journal</a>
+      <a class="nav-page" href="/contact" aria-current={pathname === '/contact' ? 'page' : undefined}>Contact</a>
+    </nav>
+    <a class="header-cta" href="/contact">Find the bottleneck <Icon name="arrow-up-right" /></a>
+    <button class="mobile-menu" type="button" aria-label="Open navigation" aria-controls="mobile-navigation">
+      <Icon name="menu" />
+    </button>
+  </div>
+</header>
+
+<dialog id="mobile-navigation" class="mobile-dialog" aria-label="Main navigation" data-lenis-prevent>
+  <div class="mobile-dialog-top"><Brand /><button class="mobile-close" type="button" aria-label="Close navigation"><Icon name="close" /></button></div>
+  <nav aria-label="Mobile navigation">
+    <a href="/work"><small>01</small>Work<Icon name="arrow-up-right" /></a>
+    <details class="mobile-services">
+      <summary><small>02</small><span class="mobile-services-label">Services</span><span class="submenu-button" aria-hidden="true"><Icon name="chevron-down" class="submenu-toggle-icon" /></span></summary>
+      <div class="mobile-service-links">
+        <a href="/services">Explore all services <Icon name="arrow-up-right" /></a>
+        {services.map(service => <a href={`/services/${service.slug}`}>{service.name}<Icon name="arrow-up-right" /></a>)}
+      </div>
+    </details>
+    <a href="/about"><small>03</small>Studio<Icon name="arrow-up-right" /></a>
+    <a href="/journal"><small>04</small>Journal<Icon name="arrow-up-right" /></a>
+    <a href="/contact"><small>05</small>Contact<Icon name="arrow-up-right" /></a>
+    <div class="mobile-secondary"><a href="/pricing">Pricing & plans</a></div>
+  </nav>
+  <a class="mobile-email" href="mailto:support@presspixelcreations.com">support@presspixelcreations.com</a>
+</dialog>
+
+<script>
+  function bindNavigation() {
+    const dialog = document.querySelector<HTMLDialogElement>('#mobile-navigation');
+    const opener = document.querySelector<HTMLButtonElement>('.mobile-menu');
+    const closer = dialog?.querySelector<HTMLButtonElement>('.mobile-close');
+    if (!dialog || !opener || opener.dataset.bound) return;
+    opener.dataset.bound = 'true';
+    opener.addEventListener('click', () => dialog.showModal());
+    closer?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+    dialog.querySelectorAll('a').forEach(link => link.addEventListener('click', () => dialog.close()));
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && dialog.open) dialog.close(); });
+
+    const servicesMenu = document.querySelector<HTMLDetailsElement>('.services-menu-item');
+    if (servicesMenu && !servicesMenu.dataset.bound) {
+      servicesMenu.dataset.bound = 'true';
+      const hoverMenu = window.matchMedia('(hover: hover) and (pointer: fine)');
+      const trigger = servicesMenu.querySelector<HTMLElement>('summary');
+      let closeTimer = 0;
+      const openMenu = () => {
+        window.clearTimeout(closeTimer);
+        if (hoverMenu.matches) servicesMenu.open = true;
+      };
+      const closeMenu = () => {
+        window.clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(() => {
+          if (!servicesMenu.matches(':hover') && !servicesMenu.matches(':focus-within')) servicesMenu.open = false;
+        }, 140);
+      };
+      servicesMenu.addEventListener('pointerenter', openMenu);
+      servicesMenu.addEventListener('pointerleave', closeMenu);
+      servicesMenu.addEventListener('focusin', () => { window.clearTimeout(closeTimer); servicesMenu.open = true; });
+      servicesMenu.addEventListener('focusout', closeMenu);
+      trigger?.addEventListener('click', event => {
+        if (hoverMenu.matches && event instanceof MouseEvent && event.detail > 0) {
+          event.preventDefault();
+          servicesMenu.open = true;
+        }
+      });
+      document.addEventListener('pointerdown', event => {
+        if (servicesMenu.open && !servicesMenu.contains(event.target as Node)) servicesMenu.open = false;
+      });
+      servicesMenu.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { servicesMenu.open = false; (servicesMenu.querySelector('summary') as HTMLElement)?.focus(); }
+      });
+    }
+  }
+  bindNavigation();
+  document.addEventListener('astro:page-load', bindNavigation);
+</script>

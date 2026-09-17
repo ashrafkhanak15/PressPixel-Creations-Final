@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import legal from '../../lib/legal.json';
+
+type Content = { title:string; seoTitle?:string; html:string; source:string; category?:string; description?:string; datePublished?:string; dateModified?:string };
+export function getStaticPaths() {
+  return Object.entries(legal).map(([slug, content]) => ({ params:{ slug }, props:{ content, kind:'POLICIES', slug } }));
+}
+const { content, kind } = Astro.props as { content:Content; kind:string };
+const fallback = content.html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 155);
+const description = content.description || fallback;
+---
+<BaseLayout title={content.seoTitle || content.title} description={description}>
+  <main id="main">
+    <PageHero eyebrow={kind} title={content.title} />
+    <article class="wrap legal-body" set:html={content.html}></article>
+  </main>
+</BaseLayout>

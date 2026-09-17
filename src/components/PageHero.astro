@@ -1,0 +1,6 @@
+---
+import SectionLabel from './SectionLabel.astro';
+interface Props { eyebrow: string; title: string; accent?: string; text?: string; }
+const { eyebrow, title, accent, text } = Astro.props;
+---
+<section class="page-hero wrap"><SectionLabel>{eyebrow}</SectionLabel><h1>{title}{accent && <><br/><span>{accent}</span></>}</h1>{text && <p>{text}</p>}</section>

@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactBanner from '../../components/ContactBanner.astro';
+import Icon from '../../components/Icon.astro';
+import SectionLabel from '../../components/SectionLabel.astro';
+import '../../styles/journal.css';
+import { getClaimedBlogSlugs, getPublicBlogPage } from '../../../db/blog';
+import { legacyBlogFallbackEnabled } from '../../../lib/blog';
+import articles from '../../../lib/articles.json';
+
+export const prerender = false;
+
+const paths = [
+  ['Visitors, but few leads','Diagnose messaging, trust, service pages, and enquiry friction.','web-development'],
+  ['Invisible in local search','Strengthen service relevance, local signals, and business credibility.','branding-seo'],
+  ['A website going stale','Give maintenance, updates, and improvements a clear owner.','waas']
+];
+const pageSize = 6;
+const rawPage = Number(Astro.url.searchParams.get('page') || '1');
+const requestedPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+let databaseAvailable = true;
+let publicPage;
+let legacyItems: typeof articles = [];
+const legacyFallback = legacyBlogFallbackEnabled();
+try {
+  publicPage = await getPublicBlogPage(requestedPage, pageSize);
+  if (legacyFallback && requestedPage === 1) {
+    const claimed = await getClaimedBlogSlugs(articles.map((article) => article.slug));
+    legacyItems = articles.filter((article) => !claimed.has(article.slug));
+  }
+} catch {
+  databaseAvailable = false;
+  legacyItems = legacyFallback ? articles : [];
+  publicPage = { posts: [], page: 1, pageCount: 1, total: legacyItems.length };
+}
+const page = publicPage.page;
+const journalItems = [...publicPage.posts, ...legacyItems];
+const canonical = new URL('/journal', Astro.site);
+if (databaseAvailable && page > 1) canonical.searchParams.set('page', String(page));
+---
+<BaseLayout title={page > 1 ? `PressPixel Journal, page ${page}` : 'Web Design, SEO & Conversion Insights'} description="Practical web design, SEO, conversion, content, and digital growth advice for service businesses that want clearer answers and better-qualified enquiries." canonical={canonical.toString()}>
+<main id="main" class="journal-page">
+  <section class="journal-masthead wrap"><SectionLabel>THE PRESSPIXEL JOURNAL</SectionLabel><h1><span class="title-line"><span>Straight answers for<br/>businesses tired of <em>guessing.</em></span></span></h1><div><span>WEBSITES / SEARCH / CONVERSION</span><p>Why digital journeys underperform, what to fix first, and how to tell whether the work is helping.</p></div></section>
+  {journalItems.length ? (
+    <section class="wrap journal-features" aria-label="Journal articles">{journalItems.map((article, index) => { const title = 'title' in article ? article.title : ''; const description = 'excerpt' in article ? article.excerpt : article.description; const category = 'category' in article ? article.category : 'FROM THE JOURNAL'; const slug = article.slug; const number = String((page - 1) * pageSize + index + 1).padStart(2, '0'); return <article data-reveal><div class="journal-feature-index"><span>{number}</span><small>{category}</small></div><div><SectionLabel>FROM THE JOURNAL</SectionLabel><h2><a class="block" href={`/journal/${slug}`}>{title}</a></h2><p>{description}</p><a class="text-link" href={`/journal/${slug}`}>Read the answer <Icon name="arrow-up-right" size={18}/></a></div></article> })}</section>
+  ) : (
+    <section class="wrap journal-empty" aria-live="polite"><SectionLabel>THE JOURNAL IS RESTING</SectionLabel><h2>New answers are<br/><em>on the way.</em></h2><p>There are no published articles yet. Check back soon.</p></section>
+  )}
+  {databaseAvailable && publicPage.pageCount > 1 && <nav class="wrap journal-pagination" aria-label="Journal pagination"><span>{publicPage.total} articles</span><div>{page > 1 && <a href={page === 2 ? '/journal' : `/journal?page=${page - 1}`} rel="prev">← Previous</a>}{page < publicPage.pageCount && <a href={`/journal?page=${page + 1}`} rel="next">Next →</a>}</div></nav>}
+  <section class="journal-practice"><div class="wrap"><SectionLabel>START WITH THE SYMPTOM</SectionLabel><h2>Where is growth<br/>getting stuck?</h2><div>{paths.map(([heading, description, slug]) => <a href={`/services/${slug}`}><h3>{heading}</h3><p>{description}</p><Icon name="arrow-up-right" size={25}/></a>)}</div></div></section>
+  <ContactBanner />
+</main>
+</BaseLayout>

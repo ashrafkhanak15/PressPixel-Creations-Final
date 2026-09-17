@@ -1,0 +1,65 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getAdminSession, getBlogPostCounts } from '../../../db/admin';
+import { CSRF_COOKIE, SESSION_COOKIE, tokenHash } from '../../../lib/admin-auth';
+
+export const prerender = false;
+
+const sessionToken = Astro.cookies.get(SESSION_COOKIE)?.value;
+if (!sessionToken) return Astro.redirect('/admin/login');
+
+let session;
+try {
+  session = await getAdminSession(tokenHash(sessionToken));
+} catch {
+  return Astro.redirect('/admin/login?error=unavailable');
+}
+if (!session) return Astro.redirect('/admin/login');
+
+let counts;
+let unavailable = false;
+try {
+  counts = await getBlogPostCounts();
+} catch {
+  unavailable = true;
+}
+const csrfToken = Astro.cookies.get(CSRF_COOKIE)?.value || '';
+---
+<AdminLayout title="Editorial desk">
+  <header class="admin-topbar">
+    <a class="admin-brand" href="/" aria-label="Back to PressPixel Creations">
+      <span class="admin-brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span>presspixel<small>CREATIONS</small></span>
+    </a>
+    {session && <div class="admin-account"><span>{session.email}</span><form method="POST" action="/api/admin/logout"><input type="hidden" name="csrfToken" value={csrfToken} /><button type="submit">Sign out</button></form></div>}
+  </header>
+
+  <main class="admin-dashboard" aria-labelledby="admin-dashboard-title">
+    <div class="admin-dashboard-heading">
+      <div><p class="admin-kicker">JOURNAL</p><h1 id="admin-dashboard-title">Editorial desk</h1></div>
+      <form method="POST" action="/api/admin/posts"><input type="hidden" name="csrfToken" value={csrfToken} /><button class="button button-primary" type="submit">New post</button></form>
+    </div>
+
+    {unavailable ? (
+      <div class="admin-empty admin-error" role="alert">
+        <p class="admin-kicker">DATABASE REQUIRED</p>
+        <h2>Dashboard unavailable</h2>
+        <p>Add the MySQL credentials, `ADMIN_AUTH_SECRET`, and first-admin bootstrap values before opening the dashboard.</p>
+      </div>
+    ) : (
+      <>
+        <div class="admin-status-grid" aria-label="Post status counts">
+          <article><span>Drafts</span><strong>{counts?.draft || 0}</strong></article>
+          <article><span>Scheduled</span><strong>{counts?.scheduled || 0}</strong></article>
+          <article><span>Published</span><strong>{counts?.published || 0}</strong></article>
+          <article><span>Trash</span><strong>{counts?.trashed || 0}</strong></article>
+        </div>
+        <div class="admin-empty">
+          <p class="admin-kicker">NEXT STEP</p>
+          <h2>Your editorial desk is ready.</h2>
+          <p>Create a draft, build it with structured blocks, and prepare its search, answer and scheduling details.</p><a class="button button-secondary" href="/admin/posts">View all posts</a>
+        </div>
+      </>
+    )}
+  </main>
+</AdminLayout>

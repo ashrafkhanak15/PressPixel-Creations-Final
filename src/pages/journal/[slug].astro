@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactBanner from '../../components/ContactBanner.astro';
+import SectionLabel from '../../components/SectionLabel.astro';
+import '../../styles/journal.css';
+import { getClaimedBlogSlugs, getPublicBlogPostBySlug, getPublicBlogRedirect, type PublicBlogPost } from '../../../db/blog';
+import { extractFaqs, renderBlogDocument } from '../../../lib/blog-content';
+import { cloudinaryImageSrcSet, cloudinaryImageUrl } from '../../../lib/blog-images';
+import { isSafeCanonicalUrl, legacyBlogFallbackEnabled } from '../../../lib/blog';
+import articles from '../../../lib/articles.json';
+
+export const prerender = false;
+
+type FallbackArticle = typeof articles[number];
+
+function formatDenverDate(value: Date | string | undefined) {
+  if (!value) return '';
+  const date = value instanceof Date ? value : new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00Z` : value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'America/Denver', month: 'long', day: 'numeric', year: 'numeric' }).format(date);
+}
+
+const slug = Astro.params.slug || '';
+let post: PublicBlogPost | null = null;
+let fallback: FallbackArticle | null = null;
+let databaseAvailable = true;
+let redirectSlug: string | null = null;
+let claimedByDatabase = false;
+const legacyFallback = legacyBlogFallbackEnabled();
+try {
+  post = await getPublicBlogPostBySlug(slug);
+  if (!post) redirectSlug = await getPublicBlogRedirect(slug);
+  if (!post && !redirectSlug && legacyFallback) claimedByDatabase = (await getClaimedBlogSlugs([slug])).has(slug);
+} catch {
+  databaseAvailable = false;
+}
+if (redirectSlug) return Astro.redirect(`/journal/${redirectSlug}`, 301);
+if (!post && legacyFallback && (!databaseAvailable || !claimedByDatabase)) fallback = articles.find((article) => article.slug === slug) || null;
+const missing = !post && !fallback;
+if (missing) Astro.response.status = 404;
+
+const title = post?.title || fallback?.title || 'Journal article not found';
+const seoTitle = (post?.seoTitle || fallback?.seoTitle || title).slice(0, 62);
+const descriptionSource = post?.metaDescription || post?.excerpt || post?.aeoSummary || fallback?.description || 'PressPixel Creations journal insights for service businesses.';
+const description = descriptionSource.replace(/\s+/g, ' ').trim().slice(0, 170);
+const socialTitle = post?.socialTitle || seoTitle;
+const socialDescription = (post?.socialDescription || description).replace(/\s+/g, ' ').trim().slice(0, 200);
+const publishedDate = post?.publishedAt || fallback?.datePublished;
+const modifiedDate = post?.updatedAt || fallback?.dateModified || fallback?.datePublished;
+const category = post?.category || fallback?.category || 'THE PRESSPIXEL JOURNAL';
+const fallbackCanonical = new URL(`/journal/${slug}`, Astro.site).toString();
+const requestedCanonical = post?.canonicalUrl || fallbackCanonical;
+const canonical = requestedCanonical && isSafeCanonicalUrl(requestedCanonical) ? requestedCanonical : fallbackCanonical;
+const requestedImage = post?.featuredMedia?.url || '/images/og-default.png';
+const articleImage = (() => { try { const url = new URL(requestedImage, Astro.site); return url.protocol === 'http:' || url.protocol === 'https:' ? url.toString() : new URL('/images/og-default.png', Astro.site).toString(); } catch { return new URL('/images/og-default.png', Astro.site).toString(); } })();
+const articleWidth = post?.featuredMedia?.width || 1200;
+const articleHeight = post?.featuredMedia?.height || 630;
+const articleImageAlt = post?.featuredMedia?.altText || 'PressPixel Creations: web design, SEO and digital growth for service businesses';
+const featuredImageSrc = cloudinaryImageUrl(articleImage, Math.min(articleWidth, 1200));
+const featuredImageSrcSet = cloudinaryImageSrcSet(articleImage, articleWidth);
+const faqs = post ? extractFaqs(post.content) : [];
+const articleSchema = missing ? undefined : {
+  '@type': 'Article',
+  '@id': `${canonical}#article`,
+  headline: title,
+  description,
+  datePublished: publishedDate instanceof Date ? publishedDate.toISOString() : publishedDate,
+  dateModified: modifiedDate instanceof Date ? modifiedDate.toISOString() : modifiedDate,
+  mainEntityOfPage: canonical,
+  image: new URL(articleImage, Astro.site).toString(),
+  articleSection: category,
+  keywords: post?.tags,
+  author: { '@id': 'https://presspixelcreations.com/#business' },
+  publisher: { '@id': 'https://presspixelcreations.com/#business' },
+};
+const faqSchema = faqs.length ? {
+  '@type': 'FAQPage',
+  '@id': `${canonical}#faq`,
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+} : undefined;
+const schemas = [articleSchema, faqSchema].filter(Boolean) as Record<string, unknown>[];
+const renderedContent = post ? renderBlogDocument(post.content) : fallback?.html || '';
+---
+<BaseLayout title={seoTitle} description={description} canonical={canonical} noindex={missing || Boolean(post?.noindex)} ogType="article" image={articleImage} imageWidth={articleWidth} imageHeight={articleHeight} imageAlt={articleImageAlt} socialTitle={socialTitle} socialDescription={socialDescription} schema={schemas}>
+  <main id="main" class="journal-article-page">
+    {missing ? (
+      <section class="wrap journal-article-not-found"><SectionLabel>THE PRESSPIXEL JOURNAL</SectionLabel><h1>That answer<br/><em>does not exist.</em></h1><p>It may have moved, or it may still be waiting in draft.</p><a class="button button-primary" href="/journal">Back to the journal</a></section>
+    ) : (
+      <>
+        <header class="wrap journal-article-header"><a class="journal-back-link" href="/journal">← The journal</a><SectionLabel>{category}</SectionLabel><h1>{title}</h1>{(post?.excerpt || fallback?.description) && <p class="journal-article-dek">{post?.excerpt || fallback?.description}</p>}<div class="journal-article-meta"><span>{formatDenverDate(publishedDate)}</span>{post?.updatedAt && <span>Updated {formatDenverDate(post.updatedAt)}</span>}<span>{post?.tags?.length ? post.tags.join(' · ') : 'PRESSPIXEL CREATIONS'}</span></div></header>
+        <article class="wrap journal-article-content">
+          {post?.featuredMedia && <figure class="journal-image journal-featured-image"><img src={featuredImageSrc} srcset={featuredImageSrcSet || undefined} sizes={featuredImageSrcSet ? '(max-width: 900px) calc(100vw - 40px), 900px' : undefined} alt={post.featuredMedia.altText} width={post.featuredMedia.width} height={post.featuredMedia.height} decoding="async" />{post.featuredMedia.caption && <figcaption>{post.featuredMedia.caption}</figcaption>}</figure>}
+          {post?.aeoSummary && <aside class="journal-callout journal-answer"><p class="journal-answer-label">THE SHORT ANSWER</p><p>{post.aeoSummary}</p></aside>}
+          <div set:html={renderedContent}></div>
+        </article>
+        <ContactBanner />
+      </>
+    )}
+  </main>
+</BaseLayout>

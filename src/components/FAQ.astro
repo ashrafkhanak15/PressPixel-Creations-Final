@@ -1,0 +1,6 @@
+---
+import { faqs } from '../../lib/content';
+interface Props { items?: [string, string][]; }
+const { items = faqs } = Astro.props;
+---
+<div class="faq-list">{items.map(([question, answer]) => <details><summary class="faq-trigger">{question}<span aria-hidden="true">+</span></summary><div class="faq-content">{answer}</div></details>)}</div>

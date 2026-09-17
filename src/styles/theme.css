@@ -1,0 +1,147 @@
+/*
+ * PRESSPIXEL DESIGN SYSTEM
+ * ---------------------------------------------------------------
+ * This is the single re-theme file for the website. Brand colours,
+ * typefaces, surfaces, text tones, borders, layout and motion all
+ * originate here. Component styles should consume these variables
+ * instead of introducing new colour literals.
+ */
+@font-face {
+  font-family: "Studio";
+  src: url("/fonts/studio.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 100 900;
+}
+
+:root {
+  /* Typography */
+  --font-primary: "Studio", Arial, Helvetica, sans-serif;
+  --font-accent: Georgia, "Times New Roman", serif;
+  --type-label: .75rem;
+  --type-meta: .8125rem;
+  --type-small: .875rem;
+  --type-body: 1rem;
+  --type-body-large: 1.0625rem;
+  --type-lead: 1.125rem;
+  --type-subhead: 1.25rem;
+
+  /* Brand */
+  --brand-primary: #ffa500;
+  --brand-primary-hover: #ffb733;
+  --brand-primary-pressed: #e69500;
+  --brand-on-primary: #1b1200;
+  --brand-on-primary-muted: #5c3a00;
+
+  /* Core canvas */
+  --color-ink: #0b0b0b;
+  --color-paper: #f2f2eb;
+  --color-paper-muted: #eeeee5;
+  --color-surface: #141414;
+  --color-surface-raised: #171717;
+  --color-surface-interactive: #262626;
+  --color-surface-light: #eeeee5;
+  --color-surface-light-warm: #e0d7c8;
+
+  /* Text */
+  --color-text: var(--color-paper);
+  --color-text-strong: #cdcdc7;
+  --color-text-muted: #a5a59b;
+  --color-text-subtle: #85857b;
+  --color-text-faint: #6f6f67;
+  --color-text-on-light: #171713;
+  --color-text-on-light-muted: #5c5c55;
+  --color-text-on-light-subtle: #66665f;
+  --color-ghost: #ffffff09;
+
+  /* Borders, overlays and focus */
+  --color-border: #353532;
+  --border-on-dark-soft: #ffffff25;
+  --border-on-dark: #ffffff35;
+  --border-on-dark-strong: #ffffff55;
+  --border-on-light-soft: #0003;
+  --border-on-light: #0004;
+  --border-on-light-strong: #0006;
+  --header-backdrop: #0b0b0bf2;
+  --dialog-backdrop: #000b;
+  --shadow-popover: #0009;
+  --color-danger: #ff8989;
+  --color-danger-soft: #ffaaa0;
+
+  /* Portfolio and editorial canvases */
+  --project-vital-surface: #ddd5c8;
+  --project-vital-ink: #2a251d;
+  --project-food-surface: #e47c3b;
+  --project-food-ink: #371f14;
+  --case-vital-accent: #e0d7c8;
+  --case-vital-ink: #292920;
+  --case-food-accent: #e78845;
+  --case-food-ink: #371e10;
+
+  /* Service story palettes */
+  --service-web-accent: #bcd7e7;
+  --service-branding-accent: #ebd685;
+  --service-marketing-accent: #f39d77;
+  --service-email-accent: #cbbaf1;
+  --service-content-accent: #eae7dc;
+  --service-web-ink: #15232c;
+  --service-web-text: #354f5f;
+  --service-web-dark: #182932;
+  --service-web-dark-text: #bdcfdb;
+  --service-web-dark-muted: #97b7c9;
+  --service-web-scope: #171b1e;
+  --service-marketing-process: #ed946e;
+  --service-marketing-ink: #1d1713;
+  --service-marketing-text: #583829;
+  --service-marketing-text-muted: #5a382a;
+  --service-email-ink: #231b38;
+  --service-email-card: #e4daf8;
+  --service-email-text: #5b4a70;
+  --service-email-text-muted: #67567e;
+  --service-email-heading: #554866;
+  --service-email-footnote: #635076;
+  --service-branding-text: #49432c;
+  --case-vital-text: #5d4c38;
+  --case-food-text: #56331e;
+  --case-breadcrumb: #61584c;
+
+  /* Layout */
+  --layout-max: 1512px;
+  --page-gutter: 56px;
+  --header-height: 108px;
+  --section-space: 112px;
+  --radius-control: .5rem;
+  --radius-card: 4px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --motion-fast: 200ms;
+  --motion-standard: 300ms;
+  --motion-medium: 600ms;
+  --ease-brand: cubic-bezier(.2, .7, .2, 1);
+
+  /* Framework/component aliases */
+  --background: var(--color-ink);
+  --foreground: var(--color-paper);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-paper);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-paper);
+  --primary: var(--brand-primary);
+  --primary-foreground: var(--color-ink);
+  --secondary: var(--color-surface-interactive);
+  --secondary-foreground: var(--color-paper);
+  --muted: var(--color-surface-interactive);
+  --muted-foreground: var(--color-text-muted);
+  --accent: var(--brand-primary);
+  --accent-foreground: var(--color-ink);
+  --destructive: var(--color-danger);
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--brand-primary);
+  --radius: var(--radius-control);
+}
+
+@media (max-width: 1150px) { :root { --page-gutter: 36px; } }
+@media (max-width: 650px) {
+  :root { --page-gutter: 20px; --header-height: 82px; --section-space: 76px; }
+}

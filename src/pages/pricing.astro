@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactBanner from '../components/ContactBanner.astro';
+import FAQ from '../components/FAQ.astro';
+import Icon from '../components/Icon.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionLabel from '../components/SectionLabel.astro';
+const plans = [
+  {name:'Starter',label:'WAAS STARTER',description:'For a service business that needs a credible website, reliable care, and a working follow-up foundation.',price:'$999.99 / month',items:['Professional website & blog','On-page SEO foundations','Maintenance & security','Google Business Profile review management','CRM, dialer & email campaigns']},
+  {name:'Plus',label:'WAAS PLUS',description:'For a business that has the foundation and now needs stronger technical and local visibility.',price:'$1,999.99 / month',items:['Everything in Starter','Technical SEO','Google Business Profile optimisation','Yelp optimisation','Yellow Pages optimisation']},
+  {name:'Pro',label:'WAAS PRO',description:'For a business ready to build a broader local search and content presence month after month.',price:'$2,499.99 / month',items:['Everything in Starter & Plus','Local SEO','Guest posting','Weekly blog posts']}
+];
+const comparisons: [string, boolean, boolean, boolean][] = [
+  ['Website, blog & on-page SEO',true,true,true],['Maintenance & security',true,true,true],['CRM, dialer & email campaigns',true,true,true],['Google Business Profile review management',true,true,true],['Technical SEO',false,true,true],['Google, Yelp & Yellow Pages optimisation',false,true,true],['Local SEO & guest posting',false,false,true],['Weekly blog posts',false,false,true]
+];
+const expectations = [['The exact work','Pages, deliverables, integrations, monthly capacity, and what is outside scope.'],['The real costs','Payment terms, software, advertising spend, sales tax, and how additional requests are priced.'],['The exit before the entrance','Ownership, access, hosting, cancellation, and handover are agreed before work starts.']];
+const pricingFaqs: [string,string][] = [
+  ['What is Website as a Service?','Website as a Service combines an initial website with ongoing maintenance, updates, and the digital services listed in your plan for a monthly fee. It gives the website one accountable team instead of leaving each change to a separate project.'],
+  ['Are advertising spend and software fees included?','Not unless your written proposal explicitly includes them. Media spend, premium software, and other third-party costs are identified separately so the monthly service and external costs remain clear.'],
+  ['Can I request work outside my plan?','Yes. We will confirm whether the request can be prioritised within your monthly scope or requires a separate quote. The plan is defined rather than unlimited so expectations remain honest on both sides.'],
+  ['What are the contract, ownership, and cancellation terms?','Those terms are set out in the agreement for your chosen plan. It covers payment, access, ownership, hosting, cancellation, and handover, and should be reviewed before you commit.']
+];
+const faqSchema = { '@type':'FAQPage', mainEntity:pricingFaqs.map(([name,text]) => ({ '@type':'Question', name, acceptedAnswer:{ '@type':'Answer', text } })) };
+const offerSchema = { '@type':'OfferCatalog', name:'Website as a Service plans', itemListElement:plans.map((plan, index) => ({ '@type':'Offer', position:index + 1, name:`Website as a Service ${plan.name}`, price:plan.price.replace(/[^0-9.]/g, ''), priceCurrency:'USD', url:'https://presspixelcreations.com/pricing', itemOffered:{ '@type':'Service', name:`Website as a Service ${plan.name}`, provider:{ '@id':'https://presspixelcreations.com/#business' } } })) };
+---
+<BaseLayout title="Website as a Service Pricing & Plans" description="Compare Website as a Service plans from $999.99 per month, including web design, maintenance, SEO, local visibility, CRM, email, and content support." schema={[faqSchema, offerSchema]}>
+<main id="main">
+  <PageHero eyebrow="WEBSITE AS A SERVICE PRICING" title="One monthly plan." accent="Fewer moving parts." text="Choose the level of website, search, content, and follow-up support the business needs now. The written proposal turns the plan into an exact scope."/>
+  <section class="wrap partnership-choice"><article data-reveal><SectionLabel>A DEFINED PROJECT</SectionLabel><h2>Solve one clear problem.</h2><p>Best when the business needs a specific website, rebrand, campaign, or content engagement with a defined delivery and handover.</p><a class="text-link" href="/contact">Request a project scope <Icon name="arrow-up-right" size={18}/></a></article><article data-reveal><SectionLabel>A MANAGED PARTNERSHIP</SectionLabel><h2>Keep one team accountable.</h2><p>Best when the website and digital presence need regular care, updates, visibility work, and follow-up without managing several providers.</p><a class="text-link" href="#monthly-plans">Compare monthly plans <Icon name="arrow-up-right" size={18}/></a></article></section>
+  <section class="wrap inner-section" id="monthly-plans"><SectionLabel>WEBSITE AS A SERVICE / MONTHLY PLANS</SectionLabel><div class="pricing-grid">{plans.map((plan, index) => <article class:list={['pricing-card', index === 1 && 'featured']}><SectionLabel>{plan.label}</SectionLabel><h2>{plan.name}</h2><p>{plan.description}</p><div class="price">{plan.price}</div><ul>{plan.items.map(item => <li>{item}</li>)}</ul><a class:list={['button', index === 1 ? 'button-dark' : 'button-outline']} href="/contact?service=Website%20as%20a%20Service">See if {plan.name} fits<Icon name="arrow-up-right" size={17}/></a></article>)}</div><p class="pricing-note">All prices are in USD. Sales tax applies where required. Your proposal confirms the exact build, monthly work, payment terms, and third-party or advertising costs. Standalone projects are quoted separately.</p></section>
+  <section class="wrap plan-comparison section-space"><SectionLabel>COMPARE THE ACTUAL SCOPE</SectionLabel><h2>What changes<br/>as the plan grows.</h2><div class="comparison-scroll" tabindex="0" role="region" aria-label="Plan comparison" data-lenis-prevent><table><caption class="sr-only">Website as a Service plan features</caption><thead><tr><th scope="col">Included service</th><th scope="col">Starter</th><th scope="col">Plus</th><th scope="col">Pro</th></tr></thead><tbody>{comparisons.map(([name, ...included]) => <tr><th scope="row">{name}</th>{included.map(yes => <td>{yes ? 'Included' : '—'}</td>)}</tr>)}</tbody></table></div></section>
+  <section class="partnership-expectations"><div class="wrap"><SectionLabel>CLARITY BEFORE COMMITMENT</SectionLabel><h2>A good agreement answers<br/>the awkward questions early.</h2><div class="expectations-grid">{expectations.map(([heading, description]) => <article data-reveal><h3>{heading}</h3><p>{description}</p></article>)}</div><a class="text-link" href="/services/waas">Understand Website as a Service <Icon name="arrow-up-right" size={18}/></a></div></section>
+  <section class="wrap section-space faq-section"><div><SectionLabel>BEFORE YOU CHOOSE</SectionLabel><h2>What the monthly fee<br/>does and does not cover.</h2></div><FAQ items={pricingFaqs}/></section>
+  <ContactBanner />
+</main>
+</BaseLayout>

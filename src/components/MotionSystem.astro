@@ -1,0 +1,58 @@
+<script>
+  import gsap from 'gsap';
+  import ScrollTrigger from 'gsap/ScrollTrigger';
+  import Lenis from 'lenis';
+
+  type MotionState = { clean?: () => void };
+  const motionWindow = window as Window & { __presspixelMotion?: MotionState };
+  motionWindow.__presspixelMotion ??= {};
+
+  function initialiseMotion() {
+    motionWindow.__presspixelMotion?.clean?.();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+    const context = gsap.context(() => {
+      const lines = document.querySelectorAll('main h1 .title-line > span');
+      if (lines.length) gsap.fromTo(lines, { yPercent: 108, rotate: 2 }, { yPercent: 0, rotate: 0, duration: 1.1, stagger: .12, ease: 'power4.out', clearProps: 'transform' });
+      else gsap.fromTo('main h1', { y: 35, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: 'power3.out', clearProps: 'transform,opacity' });
+
+      gsap.utils.toArray<HTMLElement>('main [data-reveal], main .section-heading, main .story-heading, main .service-intro > div, main .process-grid article, main .project-card, main .pricing-card').forEach(element => {
+        gsap.fromTo(element, { opacity: 0 }, { opacity: 1, duration: .65, ease: 'power2.out', clearProps: 'opacity', scrollTrigger: { trigger: element, start: 'top 94%', once: true } });
+      });
+
+      gsap.utils.toArray<HTMLElement>('[data-flow]').forEach(flow => {
+        gsap.fromTo(flow.querySelectorAll('[data-flow-step]'), { y: 40, opacity: .2 }, { y: 0, opacity: 1, stagger: .22, ease: 'none', scrollTrigger: { trigger: flow, start: 'top 88%', end: 'bottom 65%', scrub: .6 } });
+      });
+
+      gsap.to('.scroll-progress', { scaleX: 1, transformOrigin: 'left', ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: .2 } });
+      if (document.querySelector('.discipline-strip > div')) gsap.to('.discipline-strip > div', { xPercent: -50, duration: 38, ease: 'none', repeat: -1 });
+      if (document.querySelector('.hero-art img')) gsap.to('.hero-art img', { rotation: 3, y: -16, duration: 5, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      const parallax = document.querySelector<HTMLElement>('[data-parallax]');
+      if (parallax) gsap.fromTo(parallax, { yPercent: -4 }, { yPercent: 4, ease: 'none', scrollTrigger: { trigger: parallax, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+
+    const lenis = new Lenis({ duration: 1.05, smoothWheel: true, syncTouch: false, anchors: { offset: -112 }, prevent: node => (node as HTMLElement).hasAttribute?.('data-lenis-prevent') });
+    const tick = (time: number) => lenis.raf(time * 1000);
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
+
+    let frame = 0;
+    const resize = new ResizeObserver(() => { cancelAnimationFrame(frame); frame = requestAnimationFrame(() => ScrollTrigger.refresh()); });
+    const main = document.querySelector('main');
+    if (main) resize.observe(main);
+
+    motionWindow.__presspixelMotion!.clean = () => {
+      resize.disconnect();
+      cancelAnimationFrame(frame);
+      gsap.ticker.remove(tick);
+      lenis.destroy();
+      context.revert();
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+    document.fonts.ready.then(() => ScrollTrigger.refresh());
+  }
+
+  initialiseMotion();
+</script>

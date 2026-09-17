@@ -1,0 +1,82 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import MotionSystem from '../components/MotionSystem.astro';
+import '../styles/global.css';
+import '../styles/astro-overrides.css';
+
+interface Props { title?: string; description?: string; noindex?: boolean; ogType?: 'website' | 'article'; image?: string; imageWidth?: number; imageHeight?: number; imageAlt?: string; canonical?: string; socialTitle?: string; socialDescription?: string; schema?: Record<string, unknown> | Record<string, unknown>[]; }
+const {
+  title = 'Web Design & Digital Growth for Service Businesses',
+  description = 'Conversion-focused web design, SEO, digital marketing, content, and ongoing website support for service businesses.',
+  noindex = false,
+  ogType = 'website',
+  image = '/images/og-default.png',
+  imageWidth = 1200,
+  imageHeight = 630,
+  imageAlt = 'PressPixel Creations: web design, SEO and digital growth for service businesses',
+  canonical: canonicalValue,
+  socialTitle,
+  socialDescription,
+  schema: pageSchema,
+} = Astro.props;
+const titleSuffix = ' | PressPixel Creations';
+const fullTitle = title.includes('PressPixel Creations') || title.length + titleSuffix.length > 62 ? title : `${title}${titleSuffix}`;
+function absoluteUrl(value: string, fallback: URL) {
+  try {
+    const url = new URL(value, Astro.site);
+    if (url.protocol === 'http:' || url.protocol === 'https:') return url;
+  } catch {
+    // Use the route URL when stored metadata is malformed.
+  }
+  return fallback;
+}
+const canonical = absoluteUrl(canonicalValue || Astro.url.pathname, new URL(Astro.url.pathname, Astro.site));
+const socialImage = absoluteUrl(image, new URL('/images/og-default.png', Astro.site));
+const socialTitleValue = socialTitle || fullTitle;
+const socialDescriptionValue = socialDescription || description;
+const businessSchema = {
+  '@type': 'ProfessionalService', '@id': 'https://presspixelcreations.com/#business', name: 'PressPixel Creations',
+  url: 'https://presspixelcreations.com', email: 'support@presspixelcreations.com', telephone: '+1-646-376-8582',
+  address: { '@type': 'PostalAddress', streetAddress: '30 N Gould St, Ste R', addressLocality: 'Sheridan', addressRegion: 'WY', postalCode: '82801', addressCountry: 'US' },
+  sameAs: ['https://www.instagram.com/presspixelcreations','https://www.facebook.com/people/PressPixel-Creations/61560553956268/']
+};
+const webSiteSchema = { '@type':'WebSite', '@id':'https://presspixelcreations.com/#website', url:'https://presspixelcreations.com', name:'PressPixel Creations', publisher:{ '@id':'https://presspixelcreations.com/#business' } };
+const pageSchemas = pageSchema ? (Array.isArray(pageSchema) ? pageSchema : [pageSchema]) : [];
+const structuredData = { '@context':'https://schema.org', '@graph':[businessSchema, webSiteSchema, ...pageSchemas] };
+---
+<!doctype html>
+<html lang="en" id="top">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0b0b0b" />
+    {noindex && <meta name="robots" content="noindex,follow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="PressPixel Creations" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={socialTitleValue} />
+    <meta property="og:description" content={socialDescriptionValue} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={socialTitleValue} />
+    <meta name="twitter:description" content={socialDescriptionValue} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <title>{fullTitle}</title>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  </head>
+  <body>
+    <SiteHeader />
+    <slot />
+    <SiteFooter />
+    <MotionSystem />
+  </body>
+</html>

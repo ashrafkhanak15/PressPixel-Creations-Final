@@ -1,0 +1,8 @@
+---
+import { services } from '../../lib/content';
+import Icon from './Icon.astro';
+interface Props { compact?: boolean; }
+const { compact = false } = Astro.props;
+const shownServices = compact ? services.slice(0, 4) : services;
+---
+<div class="service-list">{shownServices.map((service, index) => <details open={index === 0}><summary class="service-trigger"><span class="service-index">0{index + 1}</span><span>{service.name}</span><span class="service-plus" aria-hidden="true">+</span></summary><div class="service-content"><p>{service.intro}</p><div class="tags">{service.items.slice(0, 3).map(item => <span>{item}</span>)}</div><a class="text-link" href={`/services/${service.slug}`}>Explore {service.name.toLowerCase()} <Icon name="arrow-up-right" size={16}/></a></div></details>)}</div>

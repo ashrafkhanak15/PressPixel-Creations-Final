@@ -1,0 +1,25 @@
+---
+import ContactBanner from './ContactBanner.astro';
+import FAQ from './FAQ.astro';
+import Icon from './Icon.astro';
+import SectionLabel from './SectionLabel.astro';
+import ServiceStory from './ServiceStory.astro';
+import { services } from '../../lib/content';
+import { serviceDetails } from '../../lib/service-details';
+interface Props { slug:string }
+const { slug } = Astro.props;
+const service = services.find(item => item.slug === slug)!;
+const detail = serviceDetails[slug];
+const related = detail.related.map(relatedSlug => services.find(item => item.slug === relatedSlug)!);
+---
+<main id="main" class={`service-page service-${slug}`}>
+  <section class="service-hero"><div class="wrap"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/services">Services</a><span>/</span><span aria-current="page">{service.name}</span></nav><div class="service-hero-title"><span class="service-ordinal" aria-hidden="true">0{services.indexOf(service) + 1}</span><h1>{detail.headline.map((line, index) => <span class="title-line"><span class={index === 1 ? 'accent-line' : ''}>{line}</span></span>)}</h1></div><div class="service-hero-bottom"><span class="section-label">{service.category}</span><p>{detail.lead}</p><a class="button button-primary" href={`/contact?service=${encodeURIComponent(service.name)}`}>Discuss {service.name} <Icon name="arrow-up-right" size={18}/></a></div></div></section>
+  <nav class="service-chapters wrap" aria-label="On this page"><a href="#thinking">The bottleneck</a><a href="#approach">How it works</a><a href="#scope">What changes</a><a href="#process">The process</a><a href="#questions">Straight answers</a></nav>
+  <section class="wrap service-intro section-space" id="thinking"><SectionLabel number="01">THE QUESTION BEHIND THE SERVICE</SectionLabel><div><h2>{detail.question}</h2><p>{detail.answer}</p></div></section>
+  <ServiceStory slug={slug}/>
+  <section class="wrap section-space service-scope" id="scope"><div class="section-heading"><div><SectionLabel number="02">WHAT CHANGES</SectionLabel><h2>The work behind<br/><span class="muted">the result.</span></h2></div><p class="section-aside">These are the working parts, not a fixed bundle. Your proposal connects the right ones to the bottleneck we agree to solve.</p></div><div class={`scope-grid scope-${slug}`}>{detail.chapters.map(([heading, description], index) => <article class="scope-card" data-reveal><span class="scope-number">0{index + 1}</span><h3>{heading}</h3><p>{description}</p></article>)}</div><div class="scope-tags"><span>POSSIBLE DELIVERABLES</span><div>{service.items.map(item => <span>{item}</span>)}</div></div></section>
+  <section class="service-process" id="process"><div class="wrap"><div class="section-heading"><div><SectionLabel number="03">FROM PROBLEM TO PROGRESS</SectionLabel><h2>Clear steps.<br/>Shared evidence.</h2></div></div><div class="process-grid">{detail.steps.map(([heading, description], index) => <article><span class="process-number">0{index + 1}<Icon name="arrow-right" size={20}/></span><h3>{heading}</h3><p>{description}</p></article>)}</div></div></section>
+  <section class="wrap section-space faq-section" id="questions"><div><SectionLabel number="04">WHAT BUYERS ASK BEFORE STARTING</SectionLabel><h2>No vague promises.<br/>Straight answers.</h2></div><FAQ items={detail.faqs}/></section>
+  <section class="wrap related-services"><SectionLabel>THE NEXT BOTTLENECK</SectionLabel><div class="related-grid">{related.map(item => <a href={`/services/${item.slug}`}><div><span>{item.category}</span><h2>{item.name}</h2><p>{item.short}</p></div><Icon name="arrow-up-right" size={30}/></a>)}</div></section>
+  <ContactBanner />
+</main>

@@ -1,0 +1,48 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getAdminSession } from '../../../db/admin';
+import { SESSION_COOKIE, tokenHash } from '../../../lib/admin-auth';
+
+export const prerender = false;
+
+const sessionToken = Astro.cookies.get(SESSION_COOKIE)?.value;
+if (sessionToken) {
+  try {
+    if (await getAdminSession(tokenHash(sessionToken))) return Astro.redirect('/admin');
+  } catch {
+    // The login page remains available while the database is not configured.
+  }
+}
+
+const messages: Record<string, string> = {
+  invalid: 'Email or password is incorrect.',
+  limited: 'Too many sign-in attempts. Wait 15 minutes, then try again.',
+  setup: 'Admin setup is not complete. Add the bootstrap variables before first sign-in.',
+  unavailable: 'Admin sign-in is temporarily unavailable. Check the database configuration.',
+};
+const message = messages[Astro.url.searchParams.get('error') || ''] || '';
+---
+<AdminLayout title="Admin sign in">
+  <main class="admin-auth" aria-labelledby="admin-login-title">
+    <a class="admin-brand" href="/" aria-label="Back to PressPixel Creations">
+      <span class="admin-brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span>presspixel<small>CREATIONS</small></span>
+    </a>
+    <p class="admin-kicker">EDITORIAL DESK</p>
+    <h1 id="admin-login-title">Sign in</h1>
+    <p class="admin-intro">Manage journal drafts, scheduled posts and published articles.</p>
+    {message && <p class="admin-message" role="alert">{message}</p>}
+    <form class="admin-form" method="POST" action="/api/admin/login">
+      <label>
+        Email address
+        <input name="email" type="email" autocomplete="username" inputmode="email" maxlength="254" required />
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" autocomplete="current-password" minlength="16" maxlength="256" required />
+      </label>
+      <button type="submit" class="button button-primary">Sign in</button>
+    </form>
+    <p class="admin-footnote">No public accounts. Access is restricted to PressPixel administrators.</p>
+  </main>
+</AdminLayout>

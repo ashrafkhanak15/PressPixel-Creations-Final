@@ -1,0 +1,83 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { listAdminBlogPosts } from '../../../../db/blog';
+import { getRequestAdminSession } from '../../../../lib/admin-request';
+import { CSRF_COOKIE } from '../../../../lib/admin-auth';
+import { utcToDenverDateTime } from '../../../../lib/blog';
+
+export const prerender = false;
+
+let session;
+try {
+  session = await getRequestAdminSession(Astro);
+} catch {
+  return Astro.redirect('/admin/login?error=unavailable');
+}
+if (!session) return Astro.redirect('/admin/login');
+
+let posts;
+try {
+  posts = await listAdminBlogPosts();
+} catch {
+  return Astro.redirect('/admin?error=unavailable');
+}
+const csrfToken = Astro.cookies.get(CSRF_COOKIE)?.value || '';
+---
+<AdminLayout title="Posts | Editorial desk">
+  <header class="admin-topbar">
+    <a class="admin-brand" href="/admin" aria-label="Editorial desk">
+      <span class="admin-brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span>presspixel<small>CREATIONS</small></span>
+    </a>
+    <div class="admin-account"><span>{session.email}</span><form method="POST" action="/api/admin/logout"><input type="hidden" name="csrfToken" value={csrfToken} /><button type="submit">Sign out</button></form></div>
+  </header>
+
+  <main class="admin-dashboard" aria-labelledby="posts-title">
+    <div class="admin-dashboard-heading">
+      <div><p class="admin-kicker">JOURNAL</p><h1 id="posts-title">Posts</h1></div>
+      <form method="POST" action="/api/admin/posts"><input type="hidden" name="csrfToken" value={csrfToken} /><button class="button button-primary" type="submit">New post</button></form>
+    </div>
+
+    {posts.length ? (
+      <section id="post-manager" class="admin-post-manager" data-csrf={csrfToken} aria-label="Manage posts">
+        <div class="admin-post-filters">
+          <label class="admin-post-search"><span class="sr-only">Search posts</span><input id="post-search" type="search" placeholder="Search title, URL or category" autocomplete="off" /></label>
+          <label><span class="sr-only">Filter by status</span><select id="post-status-filter"><option value="all">All statuses</option><option value="draft">Drafts</option><option value="scheduled">Scheduled</option><option value="published">Published</option><option value="trashed">Trash</option></select></label>
+        </div>
+        <div class="admin-post-bulk">
+          <label class="admin-select-all"><input id="post-select-all" type="checkbox" /><span>Select all visible</span></label>
+          <span id="post-selection-count" class="admin-selection-count" aria-live="polite">0 selected</span>
+          <label><span class="sr-only">Bulk action</span><select id="post-bulk-action"><option value="">Bulk actions</option><option value="trash">Move to trash</option><option value="restore">Restore as draft</option></select></label>
+          <button id="post-bulk-apply" class="button button-secondary" type="button">Apply</button>
+        </div>
+        <p id="post-manager-message" class="editor-message" hidden role="status" aria-live="polite"></p>
+        <div class="admin-post-list" role="list">
+          {posts.map((post) => <article role="listitem" data-post-row data-post-id={post.id} data-post-status={post.status} data-post-search={`${post.title} ${post.slug} ${post.category}`.toLowerCase()}>
+            <label class="admin-post-select"><input type="checkbox" data-post-select value={post.id} /><span class="sr-only">Select {post.title || 'untitled draft'}</span></label>
+            <div class="admin-post-list__main">
+              <span class={`admin-status admin-status--${post.status}`}>{post.status}</span>
+              <h2><a href={`/admin/posts/${post.id}`}>{post.title || 'Untitled draft'}</a></h2>
+              <p>{post.slug ? `/${post.slug}` : 'No public URL yet'}{post.category ? ` · ${post.category}` : ''}</p>
+            </div>
+            <div class="admin-post-list__meta">
+              <div class="admin-post-list__date">
+                {post.status === 'scheduled' && post.scheduledFor ? <>Scheduled<br /><time datetime={post.scheduledFor.toISOString()}>{utcToDenverDateTime(post.scheduledFor).replace('T', ' ')}</time></> : <>Updated<br /><time datetime={post.updatedAt.toISOString()}>{post.updatedAt.toLocaleDateString('en-US', { timeZone: 'America/Denver', month: 'short', day: 'numeric', year: 'numeric' })}</time></>}
+              </div>
+              <div class="admin-post-row-actions">
+                {post.status === 'published' && post.slug && <a href={`/journal/${post.slug}`} target="_blank" rel="noopener">View</a>}
+                <a class="admin-post-edit" href={`/admin/posts/${post.id}`}>Edit</a>
+                <button type="button" data-post-action={post.status === 'trashed' ? 'restore' : 'trash'} data-post-action-id={post.id}>{post.status === 'trashed' ? 'Restore' : 'Move to trash'}</button>
+              </div>
+            </div>
+          </article>)}
+        </div>
+        <p id="post-empty-filter" class="admin-filter-empty" hidden>No posts match this search and status.</p>
+      </section>
+    ) : (
+      <div class="admin-empty"><p class="admin-kicker">EMPTY JOURNAL</p><h2>Start with a draft.</h2><p>Your first post stays private until the public journal is connected in the publishing step.</p></div>
+    )}
+  </main>
+</AdminLayout>
+<script>
+  import '../../../scripts/admin-post-list';
+</script>

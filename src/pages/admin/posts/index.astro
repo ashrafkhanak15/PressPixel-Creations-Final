@@ -1,6 +1,7 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { listAdminBlogPosts } from '../../../../db/blog';
+import { legacyArticleImportCompleted } from '../../../../lib/legacy-blog-import';
 import { getRequestAdminSession } from '../../../../lib/admin-request';
 import { CSRF_COOKIE } from '../../../../lib/admin-auth';
 import { utcToDenverDateTime } from '../../../../lib/blog';
@@ -16,12 +17,22 @@ try {
 if (!session) return Astro.redirect('/admin/login');
 
 let posts;
+let legacyArticleImported = false;
 try {
-  posts = await listAdminBlogPosts();
+  const [listedPosts, importCompleted] = await Promise.all([listAdminBlogPosts(), legacyArticleImportCompleted()]);
+  posts = listedPosts;
+  legacyArticleImported = importCompleted;
 } catch {
   return Astro.redirect('/admin?error=unavailable');
 }
 const csrfToken = Astro.cookies.get(CSRF_COOKIE)?.value || '';
+const statusCounts = {
+  all: posts.length,
+  draft: posts.filter((post) => post.status === 'draft').length,
+  scheduled: posts.filter((post) => post.status === 'scheduled').length,
+  published: posts.filter((post) => post.status === 'published').length,
+  trashed: posts.filter((post) => post.status === 'trashed').length,
+};
 ---
 <AdminLayout title="Posts | Editorial desk">
   <header class="admin-topbar">
@@ -32,17 +43,25 @@ const csrfToken = Astro.cookies.get(CSRF_COOKIE)?.value || '';
     <div class="admin-account"><span>{session.email}</span><form method="POST" action="/api/admin/logout"><input type="hidden" name="csrfToken" value={csrfToken} /><button type="submit">Sign out</button></form></div>
   </header>
 
-  <main class="admin-dashboard" aria-labelledby="posts-title">
+  <main id="admin-posts-page" class="admin-dashboard" data-csrf={csrfToken} aria-labelledby="posts-title">
     <div class="admin-dashboard-heading">
       <div><p class="admin-kicker">JOURNAL</p><h1 id="posts-title">Posts</h1></div>
-      <form method="POST" action="/api/admin/posts"><input type="hidden" name="csrfToken" value={csrfToken} /><button class="button button-primary" type="submit">New post</button></form>
+      <div class="admin-dashboard-actions">{!legacyArticleImported && <button id="post-import-legacy" class="button button-secondary" type="button">Import existing article</button>}<form method="POST" action="/api/admin/posts"><input type="hidden" name="csrfToken" value={csrfToken} /><button class="button button-primary" type="submit">New post</button></form></div>
     </div>
+    <p id="post-page-message" class="editor-message" hidden role="status" aria-live="polite"></p>
+
+    <nav class="admin-post-tabs" aria-label="Post sections">
+      <button type="button" class="is-active" data-post-tab="all" aria-pressed="true">All <span>{statusCounts.all}</span></button>
+      <button type="button" data-post-tab="draft" aria-pressed="false">Drafts <span>{statusCounts.draft}</span></button>
+      <button type="button" data-post-tab="scheduled" aria-pressed="false">Scheduled <span>{statusCounts.scheduled}</span></button>
+      <button type="button" data-post-tab="published" aria-pressed="false">Published <span>{statusCounts.published}</span></button>
+      <button type="button" data-post-tab="trashed" aria-pressed="false">Trash <span>{statusCounts.trashed}</span></button>
+    </nav>
 
     {posts.length ? (
-      <section id="post-manager" class="admin-post-manager" data-csrf={csrfToken} aria-label="Manage posts">
+      <section id="post-manager" class="admin-post-manager" aria-label="Manage posts">
         <div class="admin-post-filters">
-          <label class="admin-post-search"><span class="sr-only">Search posts</span><input id="post-search" type="search" placeholder="Search title, URL or category" autocomplete="off" /></label>
-          <label><span class="sr-only">Filter by status</span><select id="post-status-filter"><option value="all">All statuses</option><option value="draft">Drafts</option><option value="scheduled">Scheduled</option><option value="published">Published</option><option value="trashed">Trash</option></select></label>
+          <label class="admin-post-search"><span class="sr-only">Search posts</span><input id="post-search" type="search" placeholder="Search this section" autocomplete="off" /></label>
         </div>
         <div class="admin-post-bulk">
           <label class="admin-select-all"><input id="post-select-all" type="checkbox" /><span>Select all visible</span></label>
@@ -50,7 +69,6 @@ const csrfToken = Astro.cookies.get(CSRF_COOKIE)?.value || '';
           <label><span class="sr-only">Bulk action</span><select id="post-bulk-action"><option value="">Bulk actions</option><option value="trash">Move to trash</option><option value="restore">Restore as draft</option></select></label>
           <button id="post-bulk-apply" class="button button-secondary" type="button">Apply</button>
         </div>
-        <p id="post-manager-message" class="editor-message" hidden role="status" aria-live="polite"></p>
         <div class="admin-post-list" role="list">
           {posts.map((post) => <article role="listitem" data-post-row data-post-id={post.id} data-post-status={post.status} data-post-search={`${post.title} ${post.slug} ${post.category}`.toLowerCase()}>
             <label class="admin-post-select"><input type="checkbox" data-post-select value={post.id} /><span class="sr-only">Select {post.title || 'untitled draft'}</span></label>

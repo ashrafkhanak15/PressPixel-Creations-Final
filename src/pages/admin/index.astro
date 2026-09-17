@@ -48,12 +48,12 @@ const csrfToken = Astro.cookies.get(CSRF_COOKIE)?.value || '';
       </div>
     ) : (
       <>
-        <div class="admin-status-grid" aria-label="Post status counts">
-          <article><span>Drafts</span><strong>{counts?.draft || 0}</strong></article>
-          <article><span>Scheduled</span><strong>{counts?.scheduled || 0}</strong></article>
-          <article><span>Published</span><strong>{counts?.published || 0}</strong></article>
-          <article><span>Trash</span><strong>{counts?.trashed || 0}</strong></article>
-        </div>
+        <nav class="admin-status-grid" aria-label="Post status sections">
+          <a href="/admin/posts?status=draft"><span>Drafts</span><strong>{counts?.draft || 0}</strong></a>
+          <a href="/admin/posts?status=scheduled"><span>Scheduled</span><strong>{counts?.scheduled || 0}</strong></a>
+          <a href="/admin/posts?status=published"><span>Published</span><strong>{counts?.published || 0}</strong></a>
+          <a href="/admin/posts?status=trashed"><span>Trash</span><strong>{counts?.trashed || 0}</strong></a>
+        </nav>
         <div class="admin-empty">
           <p class="admin-kicker">NEXT STEP</p>
           <h2>Your editorial desk is ready.</h2>

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img" aria-labelledby="title">
+<title id="title">Four dimensional PressPixel tiles with orange glow</title>
+<defs>
+  <linearGradient id="face" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#4b4b4b"/>
+    <stop offset=".22" stop-color="#1b1b1b"/>
+    <stop offset=".72" stop-color="#090909"/>
+    <stop offset="1" stop-color="#242424"/>
+  </linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff0bc"/>
+    <stop offset=".16" stop-color="#ffbe32"/>
+    <stop offset=".52" stop-color="#ff8a00"/>
+    <stop offset="1" stop-color="#8a2d00"/>
+  </linearGradient>
+  <linearGradient id="side" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffba24"/>
+    <stop offset=".4" stop-color="#ff7a00"/>
+    <stop offset="1" stop-color="#4a1400"/>
+  </linearGradient>
+  <radialGradient id="ground" cx=".52" cy=".5" r=".5">
+    <stop offset="0" stop-color="#ffad18" stop-opacity=".72"/>
+    <stop offset=".36" stop-color="#ff7a00" stop-opacity=".42"/>
+    <stop offset="1" stop-color="#ff6a00" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="18" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="34"/>
+  </filter>
+  <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+    <feDropShadow dx="0" dy="24" stdDeviation="26" flood-color="#ff8500" flood-opacity=".28"/>
+  </filter>
+</defs>
+
+<ellipse cx="620" cy="1030" rx="420" ry="125" fill="url(#ground)" filter="url(#soft)"/>
+<path d="M180 1015 C410 960 800 960 1040 1025" fill="none" stroke="#ff8e00" stroke-width="11" stroke-linecap="round" opacity=".55" filter="url(#soft)"/>
+
+<g transform="rotate(-8 600 600)" filter="url(#shadow)">
+  <g transform="translate(112 228)">
+    <polygon points="60,62 338,0 384,48 105,110" fill="url(#edge)" opacity=".95" filter="url(#glow)"/>
+    <polygon points="338,0 384,48 384,324 338,280" fill="url(#side)"/>
+    <rect x="60" y="62" width="278" height="218" rx="28" fill="url(#face)" stroke="#ffd27b" stroke-width="4"/>
+    <path d="M74 78 H320" stroke="#fff" stroke-opacity=".42" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(562 118)">
+    <polygon points="42,72 344,0 396,52 94,124" fill="url(#edge)" opacity=".98" filter="url(#glow)"/>
+    <polygon points="344,0 396,52 396,342 344,292" fill="url(#side)"/>
+    <rect x="42" y="72" width="302" height="220" rx="30" fill="url(#face)" stroke="#ffd27b" stroke-width="4"/>
+    <path d="M58 88 H326" stroke="#fff" stroke-opacity=".46" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(176 608)">
+    <polygon points="42,58 326,0 374,52 88,110" fill="url(#edge)" opacity=".96" filter="url(#glow)"/>
+    <polygon points="326,0 374,52 374,330 326,282" fill="url(#side)"/>
+    <rect x="42" y="58" width="284" height="224" rx="28" fill="url(#face)" stroke="#ffd27b" stroke-width="4"/>
+    <path d="M58 74 H310" stroke="#fff" stroke-opacity=".42" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(614 516)">
+    <polygon points="42,72 342,0 394,52 94,124" fill="url(#edge)" opacity=".98" filter="url(#glow)"/>
+    <polygon points="342,0 394,52 394,338 342,290" fill="url(#side)"/>
+    <rect x="42" y="72" width="300" height="218" rx="30" fill="url(#face)" stroke="#ffd27b" stroke-width="4"/>
+    <path d="M58 88 H324" stroke="#fff" stroke-opacity=".44" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</g>
+</svg>

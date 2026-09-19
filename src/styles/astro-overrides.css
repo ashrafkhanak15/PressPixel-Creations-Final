@@ -58,16 +58,12 @@ body { font-family: var(--font-primary); }
 }
 
 /* --------------------------------------------------------------------------
-   Mobile homepage hero art direction
-   --------------------------------------------------------------------------
-   Desktop keeps the original composition. Mobile gets its own art-directed
-   hero that matches the desired mockup: the dimensional mark sits behind the
-   headline, the orange line stays tight to the copy, and the support copy / CTA
-   sit higher so the whole hero feels like one premium composition.
-*/
+   Mobile homepage hero art direction — single authoritative block
+   -------------------------------------------------------------------------- */
 @media (max-width: 650px) {
   .hero {
     position: relative;
+    overflow: hidden;
     padding-top: 28px;
     padding-bottom: 24px;
     border-bottom: 1px solid var(--border-on-dark-soft);
@@ -75,6 +71,8 @@ body { font-family: var(--font-primary); }
 
   .hero-top {
     display: block;
+    position: relative;
+    z-index: 4;
   }
 
   .hero-coordinate {
@@ -83,60 +81,62 @@ body { font-family: var(--font-primary); }
 
   .hero-top .eyebrow {
     display: block;
-    max-width: 17rem;
-    font-size: clamp(1rem, 4.25vw, 1.1rem);
-    line-height: 1.34;
+    max-width: 18rem;
+    font-size: clamp(1rem, 4.15vw, 1.08rem);
+    line-height: 1.38;
     color: var(--color-paper);
-    opacity: .92;
+    opacity: .94;
   }
 
   .hero-stage {
     position: relative;
-    min-height: clamp(25rem, 110vw, 31rem);
-    padding-top: 34px;
-    padding-bottom: 0;
-    margin-top: 0;
     isolation: isolate;
     overflow: visible;
+    min-height: clamp(20rem, 80vw, 22rem);
+    padding-top: 32px;
+    padding-bottom: 0;
+    margin-top: 0;
   }
 
   .hero h1 {
     position: relative;
-    z-index: 3;
+    z-index: 4;
     width: 100%;
-    font-size: clamp(3.45rem, 15vw, 5rem);
-    line-height: .92;
-    letter-spacing: -.065em;
+    font-size: clamp(3.25rem, 14vw, 4.6rem);
+    line-height: .93;
+    letter-spacing: -.062em;
     font-weight: 650;
+    pointer-events: none;
   }
 
   .hero h1 > .title-line {
     display: block;
     color: var(--color-paper);
     line-height: .96;
-    margin-top: 0;
+    margin: 0;
     white-space: nowrap;
+    overflow: visible;
   }
 
   .hero h1 > .title-line + .title-line {
-    margin-top: .02em;
+    margin-top: .015em;
   }
 
   .hero h1 > .home-impact {
     color: var(--brand-primary);
-    font-size: .94em;
+    font-size: .92em;
     line-height: .94;
-    margin-top: .05em;
+    margin-top: .045em;
     white-space: nowrap;
   }
 
   .hero-art {
     position: absolute;
     z-index: 1;
-    width: min(126vw, 37rem);
-    height: clamp(24rem, 100vw, 31rem);
-    right: clamp(-6.2rem, -20vw, -3.25rem);
-    top: clamp(.7rem, 2.2vw, 1.5rem);
+    width: min(112vw, 35rem);
+    height: clamp(24rem, 105vw, 28rem);
+    right: clamp(-4.4rem, -10vw, -2rem);
+    top: clamp(-3.1rem, -9vw, -1.9rem);
     bottom: auto;
     opacity: 1;
     overflow: visible;
@@ -147,6 +147,7 @@ body { font-family: var(--font-primary); }
     display: block;
     width: 100%;
     height: 100%;
+    background: transparent;
   }
 
   .hero-art img {
@@ -154,14 +155,24 @@ body { font-family: var(--font-primary); }
     height: 100%;
     object-fit: contain;
     object-position: center top;
-    mix-blend-mode: normal;
-    opacity: .97;
-    filter: drop-shadow(0 14px 24px rgb(255 165 0 / .18));
-    transform: rotate(0deg) scale(1.01);
+    mix-blend-mode: screen !important;
+    opacity: .98;
+    filter: none;
   }
 
   .hero-art::after {
     content: none;
+  }
+
+  .hero-stage::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgb(11 11 11 / .34) 0%, rgb(11 11 11 / .12) 39%, transparent 69%),
+      linear-gradient(180deg, transparent 68%, rgb(11 11 11 / .18) 100%);
   }
 
   .art-note {
@@ -170,22 +181,22 @@ body { font-family: var(--font-primary); }
 
   .hero-bottom {
     position: relative;
-    z-index: 3;
+    z-index: 4;
     display: block;
-    margin-top: clamp(-1.2rem, -4vw, -.45rem);
+    margin-top: .3rem;
     padding-top: 0;
     border-top: 0;
   }
 
   .hero-bottom > p {
-    max-width: 20rem;
-    font-size: clamp(1rem, 4.4vw, 1.16rem);
-    line-height: 1.5;
+    max-width: 21.75rem;
+    font-size: clamp(1rem, 4.25vw, 1.12rem);
+    line-height: 1.52;
     color: var(--color-text-muted);
   }
 
   .hero-bottom .button {
-    width: min(100%, 21rem);
+    width: min(100%, 23.5rem);
     margin-top: 24px;
     justify-content: space-between;
     gap: 18px;
@@ -214,174 +225,37 @@ body { font-family: var(--font-primary); }
   }
 
   .hero-top .eyebrow {
-    max-width: 15.5rem;
+    max-width: 16rem;
     font-size: .99rem;
   }
 
   .hero-stage {
-    min-height: 23.75rem;
+    min-height: 19.6rem;
     padding-top: 30px;
   }
 
   .hero h1 {
-    font-size: 14.25vw;
+    font-size: 13.8vw;
   }
 
   .hero-art {
-    width: 132vw;
-    height: 25rem;
-    right: -5.95rem;
-    top: 1rem;
+    width: 115vw;
+    height: 24.5rem;
+    right: -3.75rem;
+    top: -2.1rem;
   }
 
   .hero-bottom {
-    margin-top: -.4rem;
+    margin-top: .2rem;
   }
 
   .hero-bottom > p {
-    max-width: 18.75rem;
+    max-width: 20rem;
     font-size: .99rem;
   }
 
   .hero-bottom .button {
     width: 100%;
     padding: 17px 22px;
-  }
-}
-
-
-/* Mobile hero v3 — match approved composition more closely */
-@media (max-width: 650px) {
-  .hero-stage {
-    min-height: clamp(22rem, 76vw, 24.5rem);
-    padding-top: 30px;
-  }
-
-  .hero h1 {
-    font-size: clamp(3.25rem, 14.2vw, 4.5rem);
-    line-height: .93;
-    letter-spacing: -.062em;
-  }
-
-  .hero h1 > .home-impact {
-    font-size: .93em;
-    margin-top: .04em;
-  }
-
-  .hero-art {
-    width: min(108vw, 35rem);
-    height: clamp(23rem, 91vw, 29rem);
-    right: clamp(-3.2rem, -8vw, -1.1rem);
-    top: 1.25rem;
-  }
-
-  .hero-art img {
-    object-fit: contain;
-    object-position: center top;
-    opacity: .94;
-    filter: none;
-    transform: none;
-  }
-
-  .hero-stage::after {
-    content: "";
-    position: absolute;
-    z-index: 2;
-    inset: 0;
-    pointer-events: none;
-    background:
-      linear-gradient(90deg, rgb(11 11 11 / .28) 0%, rgb(11 11 11 / .08) 43%, transparent 72%),
-      linear-gradient(180deg, transparent 58%, rgb(11 11 11 / .25) 100%);
-  }
-
-  .hero-bottom {
-    margin-top: .25rem;
-  }
-
-  .hero-bottom > p {
-    max-width: 22rem;
-  }
-
-  .hero-bottom .button {
-    width: min(100%, 22.5rem);
-    margin-top: 22px;
-  }
-}
-
-@media (max-width: 390px) {
-  .hero-stage {
-    min-height: 21.25rem;
-    padding-top: 28px;
-  }
-
-  .hero h1 {
-    font-size: 13.9vw;
-  }
-
-  .hero-art {
-    width: 112vw;
-    height: 23.5rem;
-    right: -2.75rem;
-    top: 1.2rem;
-  }
-
-  .hero-bottom {
-    margin-top: .15rem;
-  }
-}
-
-
-/* Mobile hero v4 — integrate artwork into the page instead of rendering it as a black rectangle */
-@media (max-width: 650px) {
-  .hero-stage {
-    min-height: clamp(23.5rem, 90vw, 26rem);
-    padding-top: 28px;
-  }
-
-  .hero-art {
-    width: min(104vw, 33rem);
-    height: clamp(22rem, 84vw, 26rem);
-    right: clamp(-3.8rem, -10vw, -1.75rem);
-    top: .45rem;
-    overflow: visible;
-  }
-
-  .hero-art picture {
-    background: transparent;
-  }
-
-  .hero-art img {
-    mix-blend-mode: screen !important;
-    opacity: .9;
-    filter: none;
-    object-fit: contain;
-    object-position: center top;
-  }
-
-  .hero-stage::after {
-    background:
-      linear-gradient(90deg, rgb(11 11 11 / .34) 0%, rgb(11 11 11 / .12) 40%, transparent 70%),
-      linear-gradient(180deg, transparent 72%, rgb(11 11 11 / .2) 100%);
-  }
-
-  .hero-bottom {
-    margin-top: .7rem;
-  }
-}
-
-@media (max-width: 390px) {
-  .hero-stage {
-    min-height: 22.5rem;
-  }
-
-  .hero-art {
-    width: 107vw;
-    height: 22.5rem;
-    right: -3.15rem;
-    top: .5rem;
-  }
-
-  .hero-bottom {
-    margin-top: .65rem;
   }
 }

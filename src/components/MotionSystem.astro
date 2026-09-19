@@ -27,7 +27,11 @@
 
       gsap.to('.scroll-progress', { scaleX: 1, transformOrigin: 'left', ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: .2 } });
       if (document.querySelector('.discipline-strip > div')) gsap.to('.discipline-strip > div', { xPercent: -50, duration: 38, ease: 'none', repeat: -1 });
-      if (document.querySelector('.hero-art img')) gsap.to('.hero-art img', { rotation: 3, y: -16, duration: 5, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      const heroArt = document.querySelector<HTMLElement>('.hero-art img');
+      if (heroArt) {
+        const compactHero = window.matchMedia('(max-width: 650px)').matches;
+        gsap.to(heroArt, { rotation: compactHero ? .5 : 3, y: compactHero ? -8 : -16, duration: compactHero ? 5.8 : 5, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      }
       const parallax = document.querySelector<HTMLElement>('[data-parallax]');
       if (parallax) gsap.fromTo(parallax, { yPercent: -4 }, { yPercent: 4, ease: 'none', scrollTrigger: { trigger: parallax, start: 'top bottom', end: 'bottom top', scrub: true } });
     });

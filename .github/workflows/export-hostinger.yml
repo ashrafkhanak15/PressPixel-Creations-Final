@@ -1,0 +1,30 @@
+name: Export Hostinger ZIP
+
+on:
+  push:
+    branches:
+      - vercel-preview
+    paths:
+      - ".github/workflows/export-hostinger.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout vercel-preview
+        uses: actions/checkout@v4
+
+      - name: Create Hostinger source ZIP
+        run: |
+          zip -r PressPixel-Creations-Final-HOSTINGER.zip .             -x ".git/*"                ".github/workflows/export-hostinger.yml"                "node_modules/*"                "dist/*"                ".vercel/*"                "scripts/assets/*.b64"
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PressPixel-Creations-Final-HOSTINGER
+          path: PressPixel-Creations-Final-HOSTINGER.zip
+          if-no-files-found: error
+          compression-level: 0

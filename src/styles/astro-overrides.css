@@ -329,3 +329,59 @@ body { font-family: var(--font-primary); }
     margin-top: .15rem;
   }
 }
+
+
+/* Mobile hero v4 — integrate artwork into the page instead of rendering it as a black rectangle */
+@media (max-width: 650px) {
+  .hero-stage {
+    min-height: clamp(23.5rem, 90vw, 26rem);
+    padding-top: 28px;
+  }
+
+  .hero-art {
+    width: min(104vw, 33rem);
+    height: clamp(22rem, 84vw, 26rem);
+    right: clamp(-3.8rem, -10vw, -1.75rem);
+    top: .45rem;
+    overflow: visible;
+  }
+
+  .hero-art picture {
+    background: transparent;
+  }
+
+  .hero-art img {
+    mix-blend-mode: screen !important;
+    opacity: .9;
+    filter: none;
+    object-fit: contain;
+    object-position: center top;
+  }
+
+  .hero-stage::after {
+    background:
+      linear-gradient(90deg, rgb(11 11 11 / .34) 0%, rgb(11 11 11 / .12) 40%, transparent 70%),
+      linear-gradient(180deg, transparent 72%, rgb(11 11 11 / .2) 100%);
+  }
+
+  .hero-bottom {
+    margin-top: .7rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero-stage {
+    min-height: 22.5rem;
+  }
+
+  .hero-art {
+    width: 107vw;
+    height: 22.5rem;
+    right: -3.15rem;
+    top: .5rem;
+  }
+
+  .hero-bottom {
+    margin-top: .65rem;
+  }
+}
